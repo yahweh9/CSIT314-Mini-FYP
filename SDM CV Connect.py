@@ -26,7 +26,12 @@ def login_page():
 
             session['username'] = user.username
             session['role'] = user.role
-            if user.role.lower() == 'admin':
+            print("================= LOGIN PATH ================")
+            print(session['role'])
+            if user.role.lower() == 'pm':
+                print("================= PM PATH ================")
+                return redirect(url_for('dashboard_platform_manager'))
+            elif user.role.lower() == 'admin':
                 return redirect(url_for('dashboard_admin'))
             elif user.role.lower() == 'pin':
                 return redirect(url_for('dashboard_pin'))
@@ -39,9 +44,17 @@ def login_page():
         
     return render_template('login.html')
 
-@app.route('/register', methods=['GET','POST'])
-def register():
-    return RegisterController.register()
+@app.route('/register_admin', methods=['GET','POST'])
+def register_admin():
+    return RegisterController.register_admin()
+
+@app.route('/register_pin', methods=['GET','POST'])
+def register_pin():
+    return RegisterController.register_pin()
+
+@app.route('/register_csrrep_or_cv', methods=['GET','POST'])
+def register_csrrep_or_cv():
+    return RegisterController.register_csrrep_or_cv()
 
 @app.route('/register_info_pin', methods=['GET','POST'])
 def registration_info_pin():
@@ -58,7 +71,15 @@ def registration_info_cv():
 @app.route('/successful_registration', methods=['GET','POST'])
 def successful_registration():
     if request.method == 'POST':
-        return render_template('login.html')
+        if 'role' in session and session['role'].lower() == 'pm':
+            return redirect(url_for('dashboard_platform_manager'))
+        elif 'role' in session and session['role'].lower() == 'admin':
+            return redirect(url_for('dashboard_admin'))
+        else:
+            return redirect(url_for('login_page'))
+        
+    # for GET request
+    return render_template('successful_registration.html')
 
 @app.route('/list_users')
 def list_users():
@@ -66,12 +87,26 @@ def list_users():
 
     return "<br>".join([f"Username: {u.username} - UserID: {u.user_id} - Full Name: {u.fullname} - Role: {u.role}" for u in users])
 
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     session.pop('role', None)
     return redirect('/')
+
+
+
+@app.route('/dashboard_platform_manager')
+def dashboard_platform_manager():
+    if 'username' not in session:
+        return redirect('/')
+    
+    # Example: Fetch data to show on dashboard
+    users = UserEntity.query.all()
+    total_users = len(users)
+
+    # Pass it to the template
+    return render_template('dashboard_platform_manager.html', users=users, total_users=total_users)
+ 
 
 @app.route('/dashboard_admin')
 def dashboard_admin():
@@ -110,5 +145,5 @@ def dashboard_cv():
 
 if __name__ == "__main__":
     with app.app_context():
-        admin1 = RegisterController.register_info_admin('admin', 'admin')
+        PM1 = RegisterController.register_info_platform_manager('pm001', 'password')
     app.run(debug=True)

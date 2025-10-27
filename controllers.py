@@ -30,25 +30,125 @@ class LoginController:
             return True
 
 class RegisterController:
+    '''
     @staticmethod
-    def register():
+    def register_platform_manager():
         if request.method == 'POST':
             register_username = request.form['username']
             register_password = request.form['password']
             confirm_password = request.form['confirm_password']
 
             if len(register_username) < 5 or len(register_password) < 5:
-                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register';</script>"
+                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_admin';</script>"
             
             if register_password != confirm_password:
-                return "<script>alert('Passwords do not match!'); window.location.href='/register';</script>"
+                return "<script>alert('Passwords do not match!'); window.location.href='/register_admin';</script>"
 
             # check if username already exists
             existing_user = UserEntity.query.filter_by(username=register_username).first()
 
+            if existing_user:
+                return "<script>alert('Username already exists!'); window.location.href='/register_admin';</script>"
+            
+            hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
+            register_role = 'pm'  # get selected role from dropdown
+            print('Registered Role:', register_role)
+
+            session['temp_username'] = register_username
+            session['temp_role'] = register_role
+            session['temp_password'] = hashed_pw
+
+            return True
+        return False
+        '''
+    
+    @staticmethod
+    def register_admin():
+        if request.method == 'POST':
+            register_username = request.form['username']
+            register_password = request.form['password']
+            confirm_password = request.form['confirm_password']
+
+            if len(register_username) < 5 or len(register_password) < 5:
+                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_admin';</script>"
+            
+            if register_password != confirm_password:
+                return "<script>alert('Passwords do not match!'); window.location.href='/register_admin';</script>"
+
+            # check if username already exists
+            existing_user = UserEntity.query.filter_by(username=register_username).first()
+            if existing_user:
+                return "<script>alert('Username already exists!'); window.location.href='/register_admin';</script>"
+            
+            hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
+            register_role = 'admin'  # get selected role from dropdown
+            print('Registered Role:', register_role)
+
+            session['temp_username'] = register_username
+            session['temp_role'] = register_role
+            session['temp_password'] = hashed_pw
+
+            # Create new admin user
+            new_admin = UserEntity(
+                username=register_username,
+                password=generate_password_hash(register_username, method='pbkdf2:sha256'),
+                role='admin'
+            )
+
+            db.session.add(new_admin)
+            db.session.commit()
+            print("Admin created successfully.")
+            return render_template('successful_registration.html')
+        return render_template('register_admin.html')
+    
+    @staticmethod
+    def register_pin():
+        if request.method == 'POST':
+            register_username = request.form['username']
+            register_password = request.form['password']
+            confirm_password = request.form['confirm_password']
+
+            if len(register_username) < 5 or len(register_password) < 5:
+                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_pin';</script>"
+            
+            if register_password != confirm_password:
+                return "<script>alert('Passwords do not match!'); window.location.href='/register_pin';</script>"
+
+            # check if username already exists
+            existing_user = UserEntity.query.filter_by(username=register_username).first()
 
             if existing_user:
-                return "<script>alert('Username already exists!'); window.location.href='/register';</script>"
+                return "<script>alert('Username already exists!'); window.location.href='/register_pin';</script>"
+            
+            hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
+            register_role = 'pin'  # get selected role from dropdown
+            print('Registered Role:', register_role)
+
+            session['temp_username'] = register_username
+            session['temp_role'] = register_role
+            session['temp_password'] = hashed_pw
+
+            return render_template('register_info_pin.html')
+        return render_template('register_pin.html')
+
+    @staticmethod
+    def register_csrrep_or_cv():
+        if request.method == 'POST':
+            register_username = request.form['username']
+            register_password = request.form['password']
+            confirm_password = request.form['confirm_password']
+
+            if len(register_username) < 5 or len(register_password) < 5:
+                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_csrrep_or_cv';</script>"
+            
+            if register_password != confirm_password:
+                return "<script>alert('Passwords do not match!'); window.location.href='/register_csrrep_or_cv';</script>"
+
+            # check if username already exists
+            existing_user = UserEntity.query.filter_by(username=register_username).first()
+
+            if existing_user:
+                return "<script>alert('Username already exists!'); window.location.href='/register_csrrep_or_cv';</script>"
             
             hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
             register_role = request.form['role']  # get selected role from dropdown
@@ -57,39 +157,33 @@ class RegisterController:
             session['temp_username'] = register_username
             session['temp_role'] = register_role
             session['temp_password'] = hashed_pw
-
-            if register_role.lower() == 'pin':
-                return render_template('register_info_pin.html')
             
-            elif register_role.lower() == 'csrrep':
+            if register_role.lower() == 'csrrep':
                 return render_template('register_info_csrrep.html')
-            
             elif register_role.lower() == 'cv':
                 return render_template('register_info_cv.html')
-
-        return render_template('register.html')
-
+            
+        return render_template('register_csrrep_or_cv.html')
+    
     @staticmethod
-    def register_info_admin(adminUsername, adminPassword):
+    def register_info_platform_manager(pmUsername, pmPassword):
         # Check if username already exists
-        existing_admin = UserEntity.query.filter_by(username=adminUsername).first()
+        existing_admin = UserEntity.query.filter_by(username=pmUsername).first()
         if existing_admin:
-            print("Admin already exists.")
+            print(f"Platform Manager, {pmUsername}, already exists.")
             return None
 
         # Create new admin user
-        new_admin = UserEntity(
-            username=adminUsername,
-            password=generate_password_hash(adminPassword, method='pbkdf2:sha256'),
-            role='admin',
-            fullname='Admin',        
-            email='admin@cvconnect.com'  
+        new_pm = UserEntity(
+            username=pmUsername,
+            password=generate_password_hash(pmPassword, method='pbkdf2:sha256'),
+            role='pm'
         )
 
-        db.session.add(new_admin)
+        db.session.add(new_pm)
         db.session.commit()
-        print("Admin created successfully.")
-        return new_admin
+        print("PM created successfully.")
+        return new_pm
 
 
 

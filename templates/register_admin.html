@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Register Admin</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>Register an admin account</h1>
+</div>
+<div class="register-box">
+    <h2 class="register-text"></h2>
+    
+    <form action="/register_admin" method="POST">
+        <div>
+            <label for="uname"><b>Username:</b></label>  
+        </div>
+        <div>
+            <input type="text" name="username" id="username"> 
+        </div>
+        <div>
+            <label for="pw"><b>Password:</b></label>
+        </div>
+        <div>
+            <input type="password" name="password" id="password">
+        </div>
+        <div>
+            <label for="pw"><b>Confirm Password:</b></label>
+        </div>
+        <div>
+            <input type="password" name="confirm_password" id="confirm_password">
+        </div>
+        <button type="submit">Register</button> 
+    </form>
+</div>
+{% endblock %}

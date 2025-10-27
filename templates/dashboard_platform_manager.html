@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Admin Dashboard</title>
+<title>Platform Manager Dashboard</title>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    <h1>Admin Dashboard</h1>
+    <h1>Platform Manager Dashboard</h1>
     <div class="header-options">
-        <a href="{{ url_for('register_csrrep_or_cv') }}" class="header-options">Register an Account</a>
+        <a href="{{ url_for('register_admin') }}" class="header-options">Create Admin Account</a>
         <a href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
 </div>

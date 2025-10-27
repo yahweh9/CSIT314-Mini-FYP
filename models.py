@@ -11,8 +11,8 @@ class UserEntity(db.Model):
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # 'pin', 'csrrep', 'cv'
-    fullname = db.Column(db.String(80), nullable=False)
-    email = db.Column(db.String(80), nullable=False)
+    fullname = db.Column(db.String(80))
+    email = db.Column(db.String(80))
 
     # Optional fields depending on role
     address = db.Column(db.String(100))  # for PINs
@@ -21,16 +21,17 @@ class UserEntity(db.Model):
     def __repr__(self):
         return f"<UserEntity(id={self.user_id}, username='{self.username}', role='{self.role}')>"
 
+class PlatformManagerEntity(UserEntity):
+    __tablename__ = 'platform_manager'
+
 class AdminEntity(UserEntity):
     __tablename__ = 'admin'
 
 class PINEntity(UserEntity):
     __tablename__ = 'pin'
 
-
 class CSRRepEntity(UserEntity):
     __tablename__ = 'csr_rep'
-
 
 class CorporateVolunteerEntity(UserEntity):
     __tablename__ = 'corporate_volunteer'
