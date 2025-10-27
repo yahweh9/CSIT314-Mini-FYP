@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Register</title>
+{% endblock %}
+
+{% block body %}
+<div class="successful-registration-box">
+    <h2 class="successful-registration-text">Registration Successful!</h2>
+    <form action="/successful_registration" method="POST">
+        <div>
+            <label for="success-text"><b>You have successfully registered your account. Return to login page.</b></label>  
+        </div>
+        
+        <button type="submit">Return</button> 
+    </form>
+</div>
+{% endblock %}

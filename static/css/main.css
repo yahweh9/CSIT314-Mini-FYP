@@ -1,0 +1,82 @@
+/* static/style.css */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: "Poppins";
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgb(113, 189, 192);
+    color: #ffffff;
+}
+
+.main-header, .dashboard {
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    align-items: center;            
+    width: 100%;                    
+    background: #000408;
+    background: rgb(0, 120, 124);
+    border-radius: 15px;
+    justify-content: space-between; 
+}
+.main-header h1, .dashboard h1 {
+    font-size: 50px;
+    padding: 0px 20px;
+}
+
+.header-options a, .dashboard a {
+    font-family: 'Poppins';
+    font-size: 23px;
+    font-weight: 670;
+    padding: 15px;
+    color: #ffffff;
+    text-decoration: none;   
+}
+
+.main-header a:hover, .dashboard a:hover{
+    text-decoration: underline;
+}
+
+.login-text {
+    margin: 10px 0px;
+    font-size: 30px;
+}
+
+.login-box, .register-box, .successful-registration-box {
+    background: rgb(0, 120, 124);
+    border: 6px solid rgb(2, 82, 85);
+    padding: 0px 60px 5px;
+    margin: 60px;
+    border-radius: 15px;
+    box-shadow: 0 0 35px rgba(0,0,0,0.3);
+}
+.login-box input, .register-box input {
+    margin: 10px;
+}
+.login-box a,  .register-box a{
+    font-family: 'Poppins';
+    font-size: 17px;
+    font-weight: 500;
+    padding: 0px;
+    color: rgb(0, 39, 41);   
+}
+.login-box a:hover, .register-box a:hover {
+    font-weight: 600;
+    color: #6deeff; 
+}
+
+.login-box button, .register-box button, .successful-registration-box button {
+    display: block;
+    margin: 15px 0px;
+    padding: 5px 12px;
+    cursor: pointer;
+}
+.login-box button:hover, .register-box button:hover {
+    display: block;
+    margin: 15px 0px;
+    padding: 5px 12px
+}

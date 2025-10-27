@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>SDM CV Connect</title>
+{% endblock %}
+
+{% block body %}
+<div class="main-header">
+    <h1>SDM CV Connect</h1>
+    <div class="header-options">
+        <a href="#" class="login_option1">Option 1</a>
+        <a href="#" class="login_option2">Option 2</a>
+        <a href="#" class="login_option3">Option 3</a>
+        <a href="#" class="login_option4">Option 4</a>
+    </div>
+</div>
+<div class="login-box">
+    <h2 class="login-text">Login</h2>
+    <form action="/" method="POST">
+        <div>
+            <label for="uname"><b>Username:</b></label>  
+            <input type="text" name="username" id="username">   
+        </div>
+        <div>
+            <label for="pw"><b>Password:</b></label>
+            <input type="password" name="password" id="password">
+        </div>
+            <a href="{{ url_for('register') }}">Register</a>
+        <div>
+
+        </div>
+        <button type="submit">Login</button> 
+    </form>
+</div>
+{% endblock %}

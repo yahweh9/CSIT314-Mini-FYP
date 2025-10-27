@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>CSR Rep Dashboard</title>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    <h1>CSR Rep Dashboard</h1>
+    <div class="header-options">
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</div>
+<div>
+    <h1>Welcome, {{ user.fullname }}</h1>
+    <p>ID: {{ user.user_id }}</p>
+    <p>Username: {{ user.username }}</p>
+    <p>Email: {{ user.email }}</p>
+    <p>Organisation: {{ user.org }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Admin Dashboard</title>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    <h1>Admin Dashboard</h1>
+    <div class="header-options">
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</div>
+<div>
+    <h2>Total Users: {{ total_users }}</h2>
+    <table border="1">
+        <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Location</th>
+
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.user_id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.address }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
