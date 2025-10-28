@@ -16,7 +16,7 @@ How to Run:
    Or can try this:
 	pip install flask flask_sqlalchemy werkzeug
 
-5. Run the Flask application file (eg. in VSCode), filename: "SDM CV Connect.py" 
+5. Run the Flask application file (eg. in VSCode), filename: "app.py" 
 
 6. Open your web browser and go to:
 	http://127.0.0.1:5000
