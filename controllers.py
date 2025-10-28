@@ -26,42 +26,15 @@ class LoginController:
         print("User found:", user)  # Debug line
         print("Input password:", input_password) # Debug line
         
+        print(f"====INPUT PASSWORD: {input_password}")
+        test = generate_password_hash(input_password, method='pbkdf2:sha256')
+        print(f"====HASH INPUT PASSWORD: {test}")
+        print(f"====HASHED ACTUAL PASSWORD: {user.password}")
         if user and check_password_hash(user.password, input_password):
             return True
 
 class RegisterController:
-    '''
-    @staticmethod
-    def register_platform_manager():
-        if request.method == 'POST':
-            register_username = request.form['username']
-            register_password = request.form['password']
-            confirm_password = request.form['confirm_password']
 
-            if len(register_username) < 5 or len(register_password) < 5:
-                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_admin';</script>"
-            
-            if register_password != confirm_password:
-                return "<script>alert('Passwords do not match!'); window.location.href='/register_admin';</script>"
-
-            # check if username already exists
-            existing_user = UserEntity.query.filter_by(username=register_username).first()
-
-            if existing_user:
-                return "<script>alert('Username already exists!'); window.location.href='/register_admin';</script>"
-            
-            hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
-            register_role = 'pm'  # get selected role from dropdown
-            print('Registered Role:', register_role)
-
-            session['temp_username'] = register_username
-            session['temp_role'] = register_role
-            session['temp_password'] = hashed_pw
-
-            return True
-        return False
-        '''
-    
     @staticmethod
     def register_admin():
         if request.method == 'POST':
@@ -91,7 +64,7 @@ class RegisterController:
             # Create new admin user
             new_admin = UserEntity(
                 username=register_username,
-                password=generate_password_hash(register_username, method='pbkdf2:sha256'),
+                password=hashed_pw,
                 role='admin'
             )
 

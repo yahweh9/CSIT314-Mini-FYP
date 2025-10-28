@@ -26,10 +26,8 @@ def login_page():
 
             session['username'] = user.username
             session['role'] = user.role
-            print("================= LOGIN PATH ================")
             print(session['role'])
-            if user.role.lower() == 'pm':
-                print("================= PM PATH ================")
+            if user.role.lower() == 'pm':  
                 return redirect(url_for('dashboard_platform_manager'))
             elif user.role.lower() == 'admin':
                 return redirect(url_for('dashboard_admin'))
