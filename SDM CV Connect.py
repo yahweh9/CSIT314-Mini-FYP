@@ -2,8 +2,18 @@ from flask import Flask, render_template, url_for, request, redirect, session
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import db, AdminEntity, UserEntity, PINEntity, CSRRepEntity, CorporateVolunteerEntity
-from controllers import LoginController, RegisterController
+#from models import db, AdminEntity, UserEntity, PINEntity, CSRRepEntity, CorporateVolunteerEntity
+from entities.UserEntity import db, UserEntity
+from entities.AdminEntity import AdminEntity
+from entities.PlatformManagerEntity import PlatformManagerEntity
+from entities.PINEntity import PINEntity
+from entities.CSRRepEntity import CSRRepEntity
+from entities.CorporateVolunteerEntity import CorporateVolunteerEntity
+
+
+#from controllers import LoginController, RegisterController
+from controllers.LoginController import LoginController
+from controllers.RegisterController import RegisterController
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
