@@ -1,19 +1,16 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>CV Dashboard</title>
+<title>Completed Request History</title>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    <h1>CV Dashboard</h1>
+    <h1>Completed Requests</h1>
     <div class="header-options">
-        <a href="{{ url_for('history_cv') }}">History</a>
+        <a href="{{ url_for('dashboard_cv') }}">Dashboard</a>
         <a href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
-</div>
-<div>
-    <h2>Welcome, {{ user.fullname }}</h2>
 </div>
 <div>
     <table class="my-table">
@@ -26,12 +23,12 @@
         </tr>
         
         <tr>
-            <td>01</td>
-            <td>John James</td>
+            <td>03</td>
+            <td>Nicole West</td>
             <td>
                 <a href="{{ url_for('logout') }}" class="pin-title">Title</a>
             </td>
-            <td>In-progress</td>
+            <td>Completed</td>
             <td>View</td>
         </tr>
         

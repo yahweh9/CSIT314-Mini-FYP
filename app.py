@@ -73,6 +73,13 @@ def dashboard_cv():
     user = UserEntity.query.filter_by(username=session['username'], role='cv').first()
     return render_template('dashboard_cv.html', user=user)
 
+@app.route('/history_cv')
+def history_cv():
+    if 'username' not in session:
+        return redirect('/')
+    user = UserEntity.query.filter_by(username=session['username'], role='cv').first()
+    return render_template('history_cv.html', user=user)
+
 @app.route('/dashboard_platform_manager')
 def dashboard_platform_manager():
     if 'username' not in session:
