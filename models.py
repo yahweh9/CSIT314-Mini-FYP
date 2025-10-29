@@ -1,4 +1,6 @@
-# Entities
+# DO NOT USE!
+
+'''# Entities
 from flask import Flask, render_template, url_for, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 
@@ -37,3 +39,4 @@ class CorporateVolunteerEntity(UserEntity):
     __tablename__ = 'corporate_volunteer'
 
 
+'''

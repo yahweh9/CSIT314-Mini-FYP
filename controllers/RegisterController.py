@@ -15,27 +15,27 @@ class RegisterController:
 
     @staticmethod
     def register_admin():
-        if request.method == 'POST':
-            register_username = request.form['username']
-            register_password = request.form['password']
-            confirm_password = request.form['confirm_password']
+        register_username = request.form['username']
+        register_password = request.form['password']
+        confirm_password = request.form['confirm_password']
 
-            if len(register_username) < 5 or len(register_password) < 5:
-                return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_admin';</script>"
-            
-            if register_password != confirm_password:
-                return "<script>alert('Passwords do not match!'); window.location.href='/register_admin';</script>"
+        if len(register_username) < 5 or len(register_password) < 5:
+            return "<script>alert('Username and password must be at least 5 characters long!'); window.location.href='/register_admin';</script>"
+        
+        if register_password != confirm_password:
+            return "<script>alert('Passwords do not match!'); window.location.href='/register_admin';</script>"
 
-            existing_user = UserEntity.query.filter_by(username=register_username).first()
-            if existing_user:
-                return "<script>alert('Username already exists!'); window.location.href='/register_admin';</script>"
-            
-            hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
-            new_admin = UserEntity(username=register_username, password=hashed_pw, role='admin')
-            db.session.add(new_admin)
-            db.session.commit()
-            return render_template('successful_registration.html')
-        return render_template('register_admin.html')
+        existing_user = UserEntity.query.filter_by(username=register_username).first()
+        if existing_user:
+            return "<script>alert('Username already exists!'); window.location.href='/register_admin';</script>"
+        
+        hashed_pw = generate_password_hash(register_password, method='pbkdf2:sha256')
+        new_admin = UserEntity(username=register_username, password=hashed_pw, role='admin')
+        db.session.add(new_admin)
+        db.session.commit()
+        return True
+
+
 
     @staticmethod
     def register_pin():
