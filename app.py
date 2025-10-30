@@ -3,12 +3,12 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Boundaries
-from boundaries.web_boundary import display_login_page, display_register_admin, display_successful_registration
-from boundaries.pin_boundary import display_dashboard_pin
-from boundaries.csrrep_boundary import display_dashboard_csrrep
-from boundaries.cv_boundary import display_dashboard_cv, display_history_cv
-from boundaries.admin_boundary import display_dashboard_admin
-from boundaries.platform_manager_boundary import display_dashboard_platform_manager
+from boundaries.web_page import display_login_page, display_register_admin, display_successful_registration
+from boundaries.pin_page import display_dashboard_pin
+from boundaries.csrrep_page import display_dashboard_csrrep
+from boundaries.cv_page import display_dashboard_cv, display_history_cv
+from boundaries.admin_page import display_dashboard_admin
+from boundaries.platform_manager_page import display_dashboard_platform_manager
 
 # Controllers
 from controllers.LoginController import LoginController

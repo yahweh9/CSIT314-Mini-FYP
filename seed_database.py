@@ -119,16 +119,63 @@ def seed_database():
         )
         pin_users.append(pin)
         db.session.add(pin)
-    
+
+
     # Commit all changes
     try:
         db.session.commit()
+
+        # 6. PIN Requests (created by CSR Reps and assigned to CVs)
+        from entities.PINRequestEntity import PINRequestEntity
+
+        pin_requests = []
+        titles = [
+            "Food Donation Drive",
+            "Community Clean-Up",
+            "Health Awareness Event",
+            "Elderly Home Visit",
+            "Fundraising Campaign",
+            "Recycling Workshop",
+            "Beach Cleanup",
+            "Tree Planting Activity",
+            "Charity Walk",
+            "Blood Donation Support"
+        ]
+
+        for i in range(1, 251):  # create 250 sample requests
+            csr_rep = random.choice(csr_reps)
+            pin = random.choice(pin_users)
+            cv = random.choice(corporate_volunteers)
+            
+            start_date = datetime.utcnow() + timedelta(days=random.randint(1, 10))
+            end_date = start_date + timedelta(days=random.randint(1, 5))
+            
+            title = f"{random.choice(titles)} #{i}"
+
+            request = PINRequestEntity(
+                requested_by_id=pin.user_id,
+                assigned_to_id=cv.user_id,
+                assigned_by_id=csr_rep.user_id,
+                title=title,
+                start_date=start_date,
+                end_date=end_date,
+                location=pin.address,
+                description=f"Provide assistance to {pin.fullname} at {pin.address}",
+                status=random.choice(["pending", "active", "completed"])
+            )
+            pin_requests.append(request)
+            db.session.add(request)
+
+        db.session.commit()
+
         print("✅ Database seeded successfully!")
         print_stats()
+        
     except Exception as e:
         db.session.rollback()
         print(f"❌ Error seeding database: {e}")
 
+        
 def print_stats():
     """Print statistics about the seeded data"""
     total_users = UserEntity.query.count()

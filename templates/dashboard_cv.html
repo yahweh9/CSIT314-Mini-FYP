@@ -16,25 +16,38 @@
     <h2>Welcome, {{ user.fullname }}</h2>
 </div>
 <div>
+    {% if requests %}
     <table class="my-table">
         <tr>
             <th>Request ID</th>
-            <th>Requested By</th>
             <th>Title</th>
+            <th>Name</th>
+            <th>Location</th>
             <th>Status</th>
             <th>Description</th>
+            <th>View Details</th>
         </tr>
-        
+
+        {% for req in requests %}
         <tr>
-            <td>01</td>
-            <td>John James</td>
+            <td>{{ req.request_id }}</td>
+            <td>{{ req.title }}</td>
+            <td>{{ req.pin_name }}</td>
+            <td>{{ req.location }}</td>
             <td>
-                <a href="{{ url_for('logout') }}" class="pin-title">Title</a>
+                <span class="status-badge {{ req.status|lower }}">
+                    {{ req.status }}
+                </span>
             </td>
-            <td>In-progress</td>
-            <td>View</td>
+            <td>{{ req.description }}</td>
+            <td>
+            <a href="{{ url_for('logout', request_id=req.request_id) }}" class="view-btn">Details</a>
+            </td>
         </tr>
-        
+        {% endfor %}
     </table>
+    {% else %}
+    <p>No active or pending requests assigned to you.</p>
+    {% endif %}
 </div>
 {% endblock %}
