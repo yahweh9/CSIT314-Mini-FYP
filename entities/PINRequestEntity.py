@@ -16,7 +16,7 @@ class PINRequestEntity(db.Model):
     assigned_to_id = db.Column(db.Integer)
     assigned_by_id = db.Column(db.Integer)
     location = db.Column(db.String(100))
-    status = db.Column(db.String(20), default='pending')
+    status = db.Column(db.String(20), default='pending') # Statuses:[pending, active, completed, expired]]
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(self, **kwargs):

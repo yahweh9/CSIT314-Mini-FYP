@@ -13,10 +13,12 @@ from boundaries.platform_manager_page import display_dashboard_platform_manager
 # Controllers
 from controllers.LoginController import LoginController
 from controllers.RegisterController import RegisterController
+from controllers.RequestController import RequestController
 
 # Entities
 # ONLY import UserEntity - remove the others!
 from entities.UserEntity import db, UserEntity
+from entities.PINRequestEntity import PINRequestEntity
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -49,6 +51,32 @@ def dashboard_csrrep():
 @app.route('/dashboard_cv')
 def dashboard_cv():
     return display_dashboard_cv()
+
+@app.route('/dashboard_cv/accept/<string:request_id>', methods=['POST'])
+def accept_request(request_id):
+    req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+    if req and req.status == 'pending':
+        req.status = 'active'
+        db.session.commit()
+    return redirect(url_for('dashboard_cv'))
+
+@app.route('/dashboard_cv/reject/<string:request_id>', methods=['POST'])
+def reject_request(request_id):
+    req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+    if req and req.status == 'pending':
+        db.session.delete(req)
+        db.session.commit()
+    return redirect(url_for('dashboard_cv'))
+
+
+@app.route('/cv/complete/<string:request_id>', methods=['POST'])
+def complete_request(request_id):
+    req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+    if req and req.status == 'active':
+        req.status = 'completed'
+        db.session.commit()
+    return redirect(url_for('dashboard_cv'))
+
 
 @app.route('/history_cv')
 def history_cv():

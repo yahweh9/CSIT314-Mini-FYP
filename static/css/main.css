@@ -12,7 +12,7 @@ body {
     color: #ffffff;
 }
 
-.main-header, .dashboard {
+.main-header, .dashboard, .cv-dashboard {
     margin: 0px;
     padding: 0px;
     display: flex;
@@ -23,9 +23,29 @@ body {
     border-radius: 15px;
     justify-content: space-between; 
 }
-.main-header h1, .dashboard h1 {
+
+.main-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    padding: 0px 0px 0px 30px;
+}
+
+.dashboard h1 {
     font-size: 50px;
-    padding: 0px 20px;
+    font-weight: 50;
+    padding: 0px 30px;
+}
+
+.cv-dashboard h1 {
+    font-size: 50px;
+    font-weight: 1000;
+    padding: 15px 20px;
+}
+
+.welcome-message h2 {
+    font-size: 30px;
+    font-weight: 570;
+    padding: 20px 0px 0px 0px;
 }
 
 .header-options a, .dashboard a {
@@ -116,7 +136,6 @@ body {
   background-color: #f4fafa;
 }
 
-
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
@@ -138,6 +157,16 @@ body {
     background-color: #95a5a6; /* grey */
 }
 
+.status-badge.expired {
+    background-color: #e74c3c; /* red */
+}
+
+.no-requests-message {
+    font-size: 25px;
+    font-weight: 400;
+    padding: 30px 20px;
+}
+
 .view-btn {
     background-color: #007bff;
     color: white;
@@ -150,4 +179,14 @@ body {
 
 .view-btn:hover {
     background-color: #0056b3;
+}
+
+.modal-title {
+    font-family: "Poppins";
+    color: #00353b;
+}
+
+.modal-body {
+    font-family: "Poppins";
+    color: #00353b;
 }

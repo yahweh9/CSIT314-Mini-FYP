@@ -147,8 +147,15 @@ def seed_database():
             pin = random.choice(pin_users)
             cv = random.choice(corporate_volunteers)
             
-            start_date = datetime.utcnow() + timedelta(days=random.randint(1, 10))
-            end_date = start_date + timedelta(days=random.randint(1, 5))
+            # randomly decide if this request is in the past or future
+            if random.random() < 0.3:  # 30% chance to make it an expired one
+                start_date = datetime.utcnow() - timedelta(days=random.randint(3, 15))
+                end_date = start_date + timedelta(days=random.randint(1, 3))
+                status = random.choice(["pending", "active"])  # expired ones are not completed
+            else:
+                start_date = datetime.utcnow() + timedelta(days=random.randint(1, 10))
+                end_date = start_date + timedelta(days=random.randint(1, 5))
+                status = random.choice(["pending", "active", "completed"])
             
             title = f"{random.choice(titles)} #{i}"
 
