@@ -1,4 +1,6 @@
-from flask import render_template, request, session
+# NOT IN USE
+
+'''from flask import render_template, request, session
 from werkzeug.security import generate_password_hash
 
 #from test import db
@@ -16,4 +18,4 @@ class CVReportController:
             assigned_to_id=cv.user_id, status='completed'
         ).all()
 
-        return completed_requests
+        return completed_requests'''

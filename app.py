@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from boundaries.web_page import display_login_page, display_register_admin, display_successful_registration
 from boundaries.pin_page import display_dashboard_pin
 from boundaries.csrrep_page import display_dashboard_csrrep
-from boundaries.cv_page import display_dashboard_cv, display_history_cv
+from boundaries.cv_page import display_dashboard_cv, display_history_cv, display_report_page
 from boundaries.admin_page import display_dashboard_admin
 from boundaries.platform_manager_page import display_dashboard_platform_manager
 
@@ -83,15 +83,7 @@ def history_cv():
 
 @app.route('/view_report')
 def view_report():
-    if 'username' not in session:
-        return redirect('/')
-
-    user = UserEntity.query.filter_by(username=session['username'], role='cv').first()
-    completed_requests = PINRequestEntity.query.filter_by(
-        assigned_to_id=user.user_id, status='completed'
-    ).all()
-
-    return render_template('cv_report.html', user=user, requests=completed_requests)
+    return display_report_page()
 
 
 @app.route('/dashboard_platform_manager')
