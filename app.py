@@ -14,6 +14,7 @@ from boundaries.platform_manager_page import display_dashboard_platform_manager
 from controllers.LoginController import LoginController
 from controllers.RegisterController import RegisterController
 from controllers.RequestController import RequestController
+from controllers.LogoutController import LogoutController
 
 # Entities
 # ONLY import UserEntity - remove the others!
@@ -187,10 +188,7 @@ def list_users():
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
-    session.pop('role', None)
-    session.pop('user_id', None)
-    return redirect('/')
+    return LogoutController.logout()
 
 if __name__ == "__main__":
     print("🚀 Starting Flask server...")

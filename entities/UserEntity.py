@@ -9,7 +9,7 @@ class UserEntity(db.Model):
     
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(30), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(200), nullable=False) # Hashed Password (Not plain)
     role = db.Column(db.String(20), nullable=False)  # 'pm', 'admin', 'pin', 'csrrep', 'cv'
     fullname = db.Column(db.String(80))
     email = db.Column(db.String(80))
