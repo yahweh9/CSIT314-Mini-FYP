@@ -111,7 +111,7 @@ class RegisterController:
         if request.method == 'POST':
             fullname = request.form['fullname']
             email = request.form['email']
-            org = request.form['org']
+            company = request.form['org']
 
             if '@' not in email or '.' not in email:
                 return "<script>alert('Please enter a valid email!'); window.location.href='/register_info_cv';</script>"
@@ -122,7 +122,7 @@ class RegisterController:
                 role=session['temp_role'],
                 fullname=fullname,
                 email=email,
-                org=org
+                company=company
             )
             db.session.add(new_user)
             db.session.commit()
@@ -134,7 +134,7 @@ class RegisterController:
         if request.method == 'POST':
             fullname = request.form['fullname']
             email = request.form['email']
-            org = request.form['org']
+            company = request.form['org']
 
             new_user = CSRRepEntity(
                 username=session['temp_username'],
@@ -142,7 +142,7 @@ class RegisterController:
                 role=session['temp_role'],
                 fullname=fullname,
                 email=email,
-                org=org
+                company=company
             )
             db.session.add(new_user)
             db.session.commit()
