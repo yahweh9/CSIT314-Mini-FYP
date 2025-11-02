@@ -77,10 +77,22 @@ def complete_request(request_id):
         db.session.commit()
     return redirect(url_for('dashboard_cv'))
 
-
 @app.route('/history_cv')
 def history_cv():
     return display_history_cv()
+
+@app.route('/view_report')
+def view_report():
+    if 'username' not in session:
+        return redirect('/')
+
+    user = UserEntity.query.filter_by(username=session['username'], role='cv').first()
+    completed_requests = PINRequestEntity.query.filter_by(
+        assigned_to_id=user.user_id, status='completed'
+    ).all()
+
+    return render_template('cv_report.html', user=user, requests=completed_requests)
+
 
 @app.route('/dashboard_platform_manager')
 def dashboard_platform_manager():

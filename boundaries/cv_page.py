@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import request, session, redirect, url_for, render_template
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
+from controllers.CVReportController import CVReportController
 
 
 
@@ -58,7 +59,13 @@ def display_history_cv():
 
     return render_template('history_cv.html', user=user, requests=completed_requests)
 
+def display_report_page():
+    if 'username' not in session:
+        return redirect('/')
 
+    cv = UserEntity.query.filter_by(username=session['username'], role='cv').first()
+    completed_requests = CVReportController.get_completed_requests(cv)
 
+    return render_template('cv_report.html', user=cv, requests=completed_requests)
 
 

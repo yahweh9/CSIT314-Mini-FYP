@@ -13,11 +13,16 @@
 
 {% block body %}
 <div class="cv-dashboard">
-    <h1>Completed Requests</h1>
+    <h1>Request History</h1>
     <div class="header-options">
         <a href="{{ url_for('dashboard_cv') }}">Dashboard</a>
         <a href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
+</div>
+<div>
+    <button onclick="window.location.href='/view_report'" class="download-btn">
+        Download Completed Requests Here
+    </button>
 </div>
 <div>
     {% if requests %}
