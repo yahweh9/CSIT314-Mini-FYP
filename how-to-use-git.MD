@@ -69,6 +69,22 @@ If you see:
 * main
 that means you are on the main branch.
 
+## 🚀 Step 5: Push Changes to GitHub
+
+1. Check what’s changed
+  git status
+
+2. Stage your changes
+  To add all changed files:
+    git add .
+Or to add specific files:
+  git add filename.txt
+
+3. Commit your changes
+  git commit -m "Describe what you changed"
+
+4. Push to GitHub
+  git push origin main
 
 
 
