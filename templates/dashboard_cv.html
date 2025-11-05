@@ -14,11 +14,12 @@
     <h1>CV Dashboard</h1>
     <div class="header-options">
         <a href="{{ url_for('history_cv') }}">History</a>
+        <a href="{{ url_for('cv_account_info') }}">Account</a>
         <a href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
 </div>
 <div class="welcome-message">
-    <h2>Welcome, {{ user.fullname }}</h2>
+    <h3>Welcome, {{ user.fullname }}. View your assigned request(s) below.</h3>
 </div>
 <div>
     {% if requests %}

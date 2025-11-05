@@ -24,7 +24,6 @@ def display_history_cv():
 
     return render_template('history_cv.html', user=cv, requests=completed_requests)
 
-
 def display_report_page():
     if 'username' not in session:
         return redirect('/')
@@ -33,5 +32,11 @@ def display_report_page():
     completed_requests = RequestController.get_request_history(cv)
 
     return render_template('cv_report.html', user=cv, requests=completed_requests)
+
+def display_account_page():
+    if 'username' not in session:
+        return redirect('/')
+    cv = UserEntity.query.filter_by(username=session['username'], role='cv').first()
+    return render_template('cv_account_info.html', user=cv)
 
 

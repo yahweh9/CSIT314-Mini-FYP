@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from boundaries.web_page import display_login_page, display_register_admin, display_successful_registration
 from boundaries.pin_page import display_dashboard_pin
 from boundaries.csrrep_page import display_dashboard_csrrep
-from boundaries.cv_page import display_dashboard_cv, display_history_cv, display_report_page
+from boundaries.cv_page import display_dashboard_cv, display_history_cv, display_report_page, display_account_page
 from boundaries.admin_page import display_dashboard_admin
 from boundaries.platform_manager_page import display_dashboard_platform_manager
 
@@ -77,6 +77,10 @@ def complete_request(request_id):
         req.status = 'completed'
         db.session.commit()
     return redirect(url_for('dashboard_cv'))
+
+@app.route('/cv_account_info')
+def cv_account_info():
+    return display_account_page()
 
 @app.route('/history_cv')
 def history_cv():
