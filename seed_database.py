@@ -120,7 +120,6 @@ def seed_database():
         pin_users.append(pin)
         db.session.add(pin)
 
-
     # Commit all changes
     try:
         db.session.commit()
@@ -142,10 +141,19 @@ def seed_database():
             "Blood Donation Support"
         ]
 
+        # Create a mapping of PIN users to CV users for consistent assignment
+        pin_cv_mapping = {}
+        for i, pin in enumerate(pin_users):
+            # Assign each PIN to a specific CV (round-robin assignment)
+            cv_index = i % len(corporate_volunteers)
+            pin_cv_mapping[pin.user_id] = corporate_volunteers[cv_index].user_id
+
         for i in range(1, 251):  # create 250 sample requests
             csr_rep = random.choice(csr_reps)
             pin = random.choice(pin_users)
-            cv = random.choice(corporate_volunteers)
+            
+            # Use the consistent mapping to assign CV to this PIN
+            assigned_cv_id = pin_cv_mapping[pin.user_id]
             
             # randomly decide if this request is in the past or future
             if random.random() < 0.3:  # 30% chance to make it an expired one
@@ -161,14 +169,19 @@ def seed_database():
 
             request = PINRequestEntity(
                 requested_by_id=pin.user_id,
-                assigned_to_id=cv.user_id,
+                assigned_to_id=assigned_cv_id,
                 assigned_by_id=csr_rep.user_id,
                 title=title,
                 start_date=start_date,
                 end_date=end_date,
                 location=pin.address,
                 description=f"Provide assistance to {pin.fullname} at {pin.address}",
-                status=random.choice(["pending", "active", "completed"])
+                status=status,
+                service_type=random.choice(["cleanup", "elderly", "education", "food", "community", "environment", "health", "fundraising"]),
+                urgency=random.choice(["low", "medium", "high"]),
+                skills_required=random.choice(["Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"]),
+                view_count=random.randint(0, 50),
+                shortlist_count=random.randint(0, 10)
             )
             pin_requests.append(request)
             db.session.add(request)
@@ -210,7 +223,7 @@ def get_sample_login_credentials():
     
     # Platform Manager
     pm = UserEntity.query.filter_by(role='pm').first()
-    print(f"Platform Manager: username='{pm.username}', password='pm_password'")
+    print(f"Platform Manager: username='{pm.username}', password='pm001'")
     
     # Admin
     admin = UserEntity.query.filter_by(role='admin').first()

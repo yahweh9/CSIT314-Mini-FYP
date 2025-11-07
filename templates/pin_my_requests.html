@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>My Requests</title>
+<style>
+    .container { 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        padding: 20px; 
+    }
+    .request-card { 
+        background: white; 
+        border: 1px solid #e0e0e0; 
+        border-radius: 8px; 
+        padding: 20px; 
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .request-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: start; 
+        margin-bottom: 15px; 
+    }
+    .request-title { 
+        font-size: 1.3em; 
+        font-weight: bold; 
+        color: #333; 
+        margin: 0; 
+    }
+    .request-meta { 
+        display: flex; 
+        gap: 20px; 
+        margin-bottom: 15px; 
+        flex-wrap: wrap;
+    }
+    .meta-item { 
+        display: flex; 
+        align-items: center; 
+        gap: 5px; 
+        color: #666; 
+    }
+    .status-badge { 
+        padding: 4px 12px; 
+        border-radius: 20px; 
+        font-size: 0.85em; 
+        font-weight: bold; 
+    }
+    .status-pending { 
+        background: #fff3cd; 
+        color: #856404; 
+    }
+    .status-active { 
+        background: #d4edda; 
+        color: #155724; 
+    }
+    .status-completed { 
+        background: #d1ecf1; 
+        color: #0c5460; 
+    }
+    .stats { 
+        display: flex; 
+        gap: 15px; 
+        margin-top: 15px; 
+    }
+    .stat { 
+        text-align: center; 
+        padding: 10px; 
+        background: #f8f9fa; 
+        border-radius: 5px; 
+        min-width: 80px; 
+    }
+    .stat-number { 
+        font-size: 1.5em; 
+        font-weight: bold; 
+        color: #007bff; 
+    }
+    .stat-label { 
+        font-size: 0.8em; 
+        color: #666; 
+    }
+    .btn { 
+        padding: 8px 16px; 
+        text-decoration: none; 
+        border-radius: 4px; 
+        display: inline-block; 
+        margin-right: 10px;
+        margin-bottom: 5px;
+    }
+    .btn-primary { 
+        background: #007bff; 
+        color: white; 
+    }
+    .btn-secondary { 
+        background: #6c757d; 
+        color: white; 
+    }
+    .btn-success { 
+        background: #28a745; 
+        color: white; 
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1>My Active Requests</h1>
+        <a href="{{ url_for('pin_create_request') }}" class="btn btn-primary">+ New Request</a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if requests %}
+        {% for request in requests %}
+        <div class="request-card">
+            <div class="request-header">
+                <h3 class="request-title">{{ request.title }}</h3>
+                <span class="status-badge status-{{ request.status }}">
+                    {{ request.status|title }}
+                </span>
+            </div>
+            
+            <div class="request-meta">
+                <div class="meta-item">
+                    <strong>Type:</strong> {{ request.service_type|title if request.service_type else 'Not specified' }}
+                </div>
+                <div class="meta-item">
+                    <strong>Location:</strong> {{ request.location if request.location else 'Not specified' }}
+                </div>
+                <div class="meta-item">
+                    <strong>Urgency:</strong> {{ request.urgency|title if request.urgency else 'Medium' }}
+                </div>
+                <div class="meta-item">
+                    <strong>Created:</strong> {{ request.created_at.strftime('%Y-%m-%d') }}
+                </div>
+            </div>
+            
+            <p>{{ request.description }}</p>
+            
+            {% if request.skills_required %}
+            <div class="meta-item">
+                <strong>Skills needed:</strong> {{ request.skills_required }}
+            </div>
+            {% endif %}
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">{{ request.view_count }}</div>
+                    <div class="stat-label">Views</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">{{ request.shortlist_count }}</div>
+                    <div class="stat-label">Interested</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{{ url_for('pin_request_detail', request_id=request.request_id) }}" class="btn btn-primary">
+                    View Details
+                </a>
+                
+                {% if request.status == 'pending' %}
+                <form method="POST" action="{{ url_for('pin_activate_request', request_id=request.request_id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-success">
+                        Activate Request
+                    </button>
+                </form>
+                {% endif %}
+                
+                {% if request.status == 'active' %}
+                <form method="POST" action="{{ url_for('pin_complete_request', request_id=request.request_id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-success" onclick="return confirm('Mark this request as completed?')">
+                        Mark Complete
+                    </button>
+                </form>
+                {% endif %}
+                
+                <a href="{{ url_for('pin_request_history') }}" class="btn btn-secondary">
+                    View History
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <h3>No active requests</h3>
+            <p>You haven't created any assistance requests yet.</p>
+            <a href="{{ url_for('pin_create_request') }}" class="btn btn-primary" style="margin-top: 15px;">
+                Create Your First Request
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Request History</title>
+<style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .history-card { 
+        background: white; 
+        border: 1px solid #e0e0e0; 
+        border-radius: 8px; 
+        padding: 20px; 
+        margin-bottom: 15px;
+    }
+    .history-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+    .history-title { font-size: 1.2em; font-weight: bold; color: #333; margin: 0; }
+    .status-badge { 
+        padding: 4px 12px; 
+        border-radius: 20px; 
+        font-size: 0.85em; 
+        font-weight: bold; 
+    }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+    .status-expired { background: #f8d7da; color: #721c24; }
+    .history-meta { color: #666; margin-bottom: 10px; }
+    .outcome { background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px; }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1>Request History</h1>
+        <div>
+            <a href="{{ url_for('pin_my_requests') }}" class="btn btn-secondary">Active Requests</a>
+            <a href="{{ url_for('pin_create_request') }}" class="btn btn-primary">+ New Request</a>
+        </div>
+    </div>
+    
+    {% if requests %}
+        {% for request in requests %}
+        <div class="history-card">
+            <div class="history-header">
+                <h3 class="history-title">{{ request.title }}</h3>
+                <span class="status-badge status-{{ request.status }}">
+                    {{ request.status|title }}
+                </span>
+            </div>
+            
+            <div class="history-meta">
+                <strong>Type:</strong> {{ request.service_type|title if request.service_type else 'Not specified' }} | 
+                <strong>Location:</strong> {{ request.location if request.location else 'Not specified' }} |
+                <strong>Completed:</strong> {{ request.updated_at.strftime('%Y-%m-%d') if request.updated_at else request.created_at.strftime('%Y-%m-%d') }}
+            </div>
+            
+            <p>{{ request.description }}</p>
+            
+            <div class="outcome">
+                <strong>Final Outcome:</strong> 
+                <span style="color: #666;">
+                    {% if request.status == 'completed' %}
+                        ✅ Successfully completed with volunteer assistance
+                    {% elif request.status == 'expired' %}
+                        ⏰ Request expired without completion
+                    {% else %}
+                        ℹ️ {{ request.status|title }}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <h3>No completed requests</h3>
+            <p>Your completed and expired requests will appear here.</p>
+            <a href="{{ url_for('pin_create_request') }}" class="btn btn-primary" style="margin-top: 15px;">
+                Create Your First Request
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,6 +1,5 @@
-#entity/PINRequestEntity.py
-
-from entities.UserEntity import db
+# entities/PINRequestEntity.py
+from .UserEntity import db
 from datetime import datetime
 
 class PINRequestEntity(db.Model):
@@ -12,16 +11,29 @@ class PINRequestEntity(db.Model):
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text)
-
+    
+    # Service details - MAKE SURE THESE EXIST
+    service_type = db.Column(db.String(50))
+    location = db.Column(db.String(100))
+    urgency = db.Column(db.String(20), default='medium')
+    skills_required = db.Column(db.String(200))
+    
+    # Assignment info
     assigned_to_id = db.Column(db.Integer)
     assigned_by_id = db.Column(db.Integer)
-    location = db.Column(db.String(100))
-    status = db.Column(db.String(20), default='pending') # Statuses:[pending, active, completed, expired]]
+    
+    # Tracking metrics  
+    status = db.Column(db.String(20), default='pending')
+    view_count = db.Column(db.Integer, default=0)
+    shortlist_count = db.Column(db.Integer, default=0)
+    
+    # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        last_request = db.session.query(PINRequestEntity).order_by(PINRequestEntity.request_id.desc()).first()
+        last_request = PINRequestEntity.query.order_by(PINRequestEntity.request_id.desc()).first()
         if last_request:
             num = int(last_request.request_id[1:]) + 1
         else:
@@ -30,4 +42,3 @@ class PINRequestEntity(db.Model):
 
     def __repr__(self):
         return f"<PINRequest(id={self.request_id}, title='{self.title}', status='{self.status}')>"
-

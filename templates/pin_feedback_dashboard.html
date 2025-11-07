@@ -1,0 +1,617 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Feedback Dashboard</title>
+<style>
+    body {
+        color: #000000;
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #000000;
+    }
+    .dashboard-section {
+        margin-bottom: 40px;
+        color: #000000;
+    }
+    .section-title {
+        color: #000000;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    .request-card, .feedback-card, .community-card, .public-feedback-card { 
+        border: 1px solid #ddd; 
+        padding: 20px; 
+        margin: 15px 0; 
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: #000000;
+    }
+    .btn { 
+        padding: 10px 20px; 
+        background: #007bff; 
+        color: white; 
+        text-decoration: none; 
+        border-radius: 5px; 
+        display: inline-block;
+        margin: 5px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .btn-warning {
+        background: #ffc107;
+        color: #000000;
+    }
+    .btn-success {
+        background: #28a745;
+    }
+    .btn-info {
+        background: #17a2b8;
+    }
+    .btn-secondary {
+        background: #6c757d;
+    }
+    .btn-danger {
+        background: #dc3545;
+    }
+    .no-items { 
+        color: #000000; 
+        font-style: italic; 
+        text-align: center;
+        padding: 40px;
+    }
+    .stats-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        color: #000000;
+        border: 1px solid #ddd;
+    }
+    .stat-item {
+        display: inline-block;
+        margin-right: 30px;
+        text-align: center;
+        color: #000000;
+    }
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #000000;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: #000000;
+    }
+    .filter-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+    }
+    .filter-group {
+        display: inline-block;
+        margin-right: 20px;
+        margin-bottom: 10px;
+    }
+    .filter-label {
+        font-weight: bold;
+        margin-right: 10px;
+        color: #000000;
+    }
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        color: #000000;
+    }
+    .rating-stars {
+        color: #ffc107;
+        font-weight: bold;
+    }
+    .feedback-meta {
+        color: #000000;
+        margin: 5px 0;
+        font-size: 14px;
+    }
+    .feedback-comments {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        border-left: 3px solid #3498db;
+        color: #000000;
+    }
+    .filter-active {
+        background: #17a2b8 !important;
+        border: 2px solid #138496;
+    }
+    .community-rating-bar {
+        background: #e9ecef;
+        border-radius: 4px;
+        margin: 5px 0;
+        overflow: hidden;
+    }
+    .rating-bar-fill {
+        background: #3498db;
+        height: 20px;
+        color: white;
+        text-align: center;
+        line-height: 20px;
+        font-size: 12px;
+    }
+    .service-rating {
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: white;
+    }
+    .service-name {
+        font-weight: bold;
+        color: #000000;
+        margin-bottom: 5px;
+    }
+    .rating-distribution {
+        margin-top: 10px;
+    }
+    .distribution-item {
+        display: flex;
+        align-items: center;
+        margin: 3px 0;
+        color: #000000;
+    }
+    .distribution-stars {
+        width: 80px;
+        color: #ffc107;
+    }
+    .distribution-bar {
+        flex-grow: 1;
+        background: #f8f9fa;
+        border-radius: 3px;
+        margin: 0 10px;
+        overflow: hidden;
+        height: 15px;
+    }
+    .distribution-fill {
+        background: #3498db;
+        height: 15px;
+        width: 0%; /* Initial width, will be set by JavaScript */
+        transition: width 0.5s ease-in-out;
+    }
+    .distribution-percent {
+        width: 50px;
+        text-align: right;
+        font-size: 12px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #000000;
+    }
+    p, strong, span {
+        color: #000000;
+    }
+    .alert {
+        color: #000000;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+    }
+    .alert-error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+    .bulk-rating-section {
+        background: #e8f5e8;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border: 1px solid #28a745;
+    }
+    .request-checkbox {
+        margin-right: 10px;
+    }
+    .user-avatar {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        background: #3498db;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 32px;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .public-feedback-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Feedback Dashboard</h1>
+    <p>Hello, {{ user.fullname }}! Manage your service feedback here.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Advanced Filter Section -->
+    <div class="filter-section">
+        <h3 style="color: #000000; margin-top: 0;">Advanced Filters</h3>
+        
+        <div class="filter-group">
+            <span class="filter-label">Rating:</span>
+            <select class="filter-select" onchange="applyFilters()" name="rating">
+                <option value="">All Ratings</option>
+                <option value="5" {% if current_rating_filter == 5 %}selected{% endif %}>5 Stars</option>
+                <option value="4" {% if current_rating_filter == 4 %}selected{% endif %}>4 Stars</option>
+                <option value="3" {% if current_rating_filter == 3 %}selected{% endif %}>3 Stars</option>
+                <option value="2" {% if current_rating_filter == 2 %}selected{% endif %}>2 Stars</option>
+                <option value="1" {% if current_rating_filter == 1 %}selected{% endif %}>1 Star</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <span class="filter-label">Service Type:</span>
+            <select class="filter-select" onchange="applyFilters()" name="service_type">
+                <option value="">All Services</option>
+                <option value="cleanup" {% if current_service_filter == 'cleanup' %}selected{% endif %}>Cleanup</option>
+                <option value="elderly" {% if current_service_filter == 'elderly' %}selected{% endif %}>Elderly Care</option>
+                <option value="education" {% if current_service_filter == 'education' %}selected{% endif %}>Education</option>
+                <option value="food" {% if current_service_filter == 'food' %}selected{% endif %}>Food Services</option>
+                <option value="community" {% if current_service_filter == 'community' %}selected{% endif %}>Community</option>
+                <option value="environment" {% if current_service_filter == 'environment' %}selected{% endif %}>Environment</option>
+                <option value="health" {% if current_service_filter == 'health' %}selected{% endif %}>Health</option>
+                <option value="fundraising" {% if current_service_filter == 'fundraising' %}selected{% endif %}>Fundraising</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <span class="filter-label">Date Range:</span>
+            <select class="filter-select" onchange="applyFilters()" name="date_range">
+                <option value="">All Time</option>
+                <option value="week" {% if current_date_filter == 'week' %}selected{% endif %}>Last Week</option>
+                <option value="month" {% if current_date_filter == 'month' %}selected{% endif %}>Last Month</option>
+                <option value="year" {% if current_date_filter == 'year' %}selected{% endif %}>Last Year</option>
+            </select>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+    <!-- Feedback Statistics -->
+    <div class="stats-container">
+        <h3>Your Feedback Summary</h3>
+        <div class="stat-item">
+            <div class="stat-value">{{ feedback_stats.total }}</div>
+            <div class="stat-label">Total Reviews</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ feedback_stats.average }}/5</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+        {% for rating in range(5, 0, -1) %}
+        <div class="stat-item">
+            <div class="stat-value">{{ feedback_stats.rating_counts[rating] }}</div>
+            <div class="stat-label">{{ rating }} Star{{ 's' if rating > 1 }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pending Feedback Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">Pending Feedback</h2>
+        
+        {% if pending_requests %}
+            <!-- Bulk Rating Section -->
+            <div class="bulk-rating-section">
+                <h4 style="color: #000000; margin-top: 0;">Quick Rating</h4>
+                <p style="color: #000000; margin-bottom: 10px;">Select multiple similar requests and rate them all at once:</p>
+                <form id="bulkRatingForm">
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #000000;">Rating:</strong>
+                        <select name="rating" required style="margin: 0 10px; padding: 5px;">
+                            <option value="">Select Rating</option>
+                            <option value="5">5 Stars - Excellent</option>
+                            <option value="4">4 Stars - Very Good</option>
+                            <option value="3">3 Stars - Good</option>
+                            <option value="2">2 Stars - Fair</option>
+                            <option value="1">1 Star - Poor</option>
+                        </select>
+                        
+                        <strong style="color: #000000; margin-left: 20px;">Comments:</strong>
+                        <input type="text" name="comments" placeholder="Optional comments" style="margin: 0 10px; padding: 5px; width: 200px;">
+                        
+                        <button type="button" onclick="submitBulkRating()" class="btn btn-success">Rate Selected</button>
+                        <button type="button" onclick="selectAllRequests()" class="btn btn-secondary">Select All</button>
+                    </div>
+                    
+                    <div class="requests-list">
+                        {% for req in pending_requests %}
+                        <div class="request-card">
+                            <label style="color: #000000; display: flex; align-items: flex-start;">
+                                <input type="checkbox" class="request-checkbox" name="request_ids" value="{{ req.request_id }}">
+                                <div style="flex-grow: 1;">
+                                    <h4 style="margin: 0 0 10px 0; color: #000000;">{{ req.title }}</h4>
+                                    <p class="feedback-meta"><strong>Service Type:</strong> {{ req.service_type|title if req.service_type else 'Not specified' }}</p>
+                                    <p class="feedback-meta"><strong>Description:</strong> {{ req.description }}</p>
+                                    <p class="feedback-meta"><strong>Rate:</strong> 
+                                        {% if req.rate_user_role == 'csrrep' %}
+                                        CSR Representative
+                                        {% else %}
+                                        Corporate Volunteer
+                                        {% endif %}
+                                    </p>
+                                    <a href="{{ url_for('display_feedback_form_route', request_id=req.request_id) }}" class="btn btn-warning" style="margin-top: 10px;">
+                                        Rate Individually
+                                    </a>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div class="no-items">
+                <p>No pending requests requiring feedback.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Community Ratings Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">Community Service Ratings</h2>
+        {% if community_ratings %}
+            <div class="community-ratings">
+                {% for service_type, data in community_ratings.items() %}
+                <div class="service-rating">
+                    <div class="service-name">{{ service_type|title }} Service</div>
+                    <div class="rating-stars">
+                        Average Rating: {{ data.average }}/5 (from {{ data.count }} reviews)
+                    </div>
+                    
+                    <div class="rating-distribution">
+                        {% for rating_val in range(5, 0, -1) %}
+                        <div class="distribution-item">
+                            <div class="distribution-stars">
+                                {% for i in range(5) %}
+                                    {% if i < rating_val %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="distribution-bar">
+                                <div class="distribution-fill" data-width="{{ data.rating_percentages[rating_val] }}"></div>
+                            </div>
+                            <div class="distribution-percent">{{ data.rating_percentages[rating_val] }}%</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-items">
+                <p>No community ratings available yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Public Feedback Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">Community Reviews</h2>
+        <p style="color: #000000; margin-bottom: 20px;">See what other community members are saying about services:</p>
+        
+        {% if public_feedback %}
+            <div class="public-feedback-list">
+                {% for feedback in public_feedback %}
+                <div class="public-feedback-card">
+                    <div class="public-feedback-header">
+                        <div class="user-avatar">{{ feedback.pin_initials }}</div>
+                        <div>
+                            <strong style="color: #000000;">{{ feedback.pin_name }}</strong>
+                            <div class="rating-stars">
+                                {% for i in range(5) %}
+                                    {% if i < feedback.rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                                ({{ feedback.rating }}/5)
+                            </div>
+                        </div>
+                    </div>
+                    <p class="feedback-meta"><strong>Service:</strong> {{ feedback.request_title }}</p>
+                    <p class="feedback-meta"><strong>Service Type:</strong> {{ feedback.service_type|title if feedback.service_type else 'General' }}</p>
+                    <p class="feedback-meta"><strong>Reviewed:</strong> {{ feedback.created_at.strftime('%Y-%m-%d') }}</p>
+                    {% if feedback.comments %}
+                    <div class="feedback-comments">
+                        <p style="margin: 0; color: #000000;">"{{ feedback.comments }}"</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-items">
+                <p>No community reviews available yet.</p>
+                {% if current_rating_filter or current_service_filter or current_date_filter %}
+                <p>Try adjusting your filters to see more results.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Personal Feedback History Section -->
+    <div class="dashboard-section">
+        <h2 class="section-title">Your Feedback History</h2>
+        {% if feedback_history %}
+            <div class="feedback-list">
+                {% for feedback in feedback_history %}
+                <div class="feedback-card">
+                    <h4>{{ feedback.request_title }}</h4>
+                    <div class="rating-stars">
+                        {% for i in range(5) %}
+                            {% if i < feedback.rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                        ({{ feedback.rating }}/5)
+                    </div>
+                    <p class="feedback-meta"><strong>Service Type:</strong> {{ feedback.service_type|title }}</p>
+                    <p class="feedback-meta"><strong>Rated:</strong> 
+                        {% if feedback.rated_user_role == 'csrrep' %}
+                        CSR Representative
+                        {% else %}
+                        Corporate Volunteer
+                        {% endif %}
+                    </p>
+                    <p class="feedback-meta"><strong>Submitted:</strong> {{ feedback.created_at.strftime('%Y-%m-%d at %H:%M') }}</p>
+                    {% if feedback.comments %}
+                    <div class="feedback-comments">
+                        <strong>Your Comments:</strong>
+                        <p>{{ feedback.comments }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-items">
+                <p>No feedback submitted yet.</p>
+                {% if current_rating_filter or current_service_filter or current_date_filter %}
+                <p>No matching reviews found with current filters.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <br>
+    <a href="{{ url_for('dashboard_pin') }}" style="color: #000000; text-decoration: underline;">← Back to Dashboard</a>
+</div>
+
+<script>
+// Apply percentage widths for distribution bars
+document.addEventListener('DOMContentLoaded', function() {
+    const fillElements = document.querySelectorAll('.distribution-fill[data-width]');
+    fillElements.forEach(element => {
+        const width = element.getAttribute('data-width');
+        if (width && !isNaN(width)) {
+            // Set the width with a slight delay for animation effect
+            setTimeout(() => {
+                element.style.width = width + '%';
+            }, 100);
+        }
+    });
+});
+
+function applyFilters() {
+    const rating = document.querySelector('select[name="rating"]').value;
+    const serviceType = document.querySelector('select[name="service_type"]').value;
+    const dateRange = document.querySelector('select[name="date_range"]').value;
+    
+    let url = '{{ url_for("pin_feedback_dashboard") }}';
+    const params = [];
+    
+    if (rating) params.push(`rating=${rating}`);
+    if (serviceType) params.push(`service_type=${serviceType}`);
+    if (dateRange) params.push(`date_range=${dateRange}`);
+    
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+    
+    window.location.href = url;
+}
+
+function clearFilters() {
+    window.location.href = '{{ url_for("pin_feedback_dashboard") }}';
+}
+
+function selectAllRequests() {
+    const checkboxes = document.querySelectorAll('.request-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+    });
+}
+
+function submitBulkRating() {
+    const form = document.getElementById('bulkRatingForm');
+    const formData = new FormData(form);
+    const rating = formData.get('rating');
+    
+    if (!rating) {
+        alert('Please select a rating');
+        return;
+    }
+    
+    const selectedRequests = Array.from(document.querySelectorAll('.request-checkbox:checked'));
+    if (selectedRequests.length === 0) {
+        alert('Please select at least one request to rate');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to give ${rating} stars to ${selectedRequests.length} selected requests?`)) {
+        return;
+    }
+    
+    // Prepare data for AJAX request
+    const requestIds = selectedRequests.map(cb => cb.value);
+    const data = {
+        'request_ids[]': requestIds,
+        'rating': rating,
+        'comments': formData.get('comments') || ''
+    };
+    
+    // Send AJAX request
+    fetch('{{ url_for("bulk_rate_requests") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    })
+    .catch(error => {
+        alert('Error submitting bulk rating: ' + error);
+    });
+}
+</script>
+{% endblock %}

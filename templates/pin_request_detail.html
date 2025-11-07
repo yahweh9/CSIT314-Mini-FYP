@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Request Details - {{ request.title }}</title>
+<style>
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .detail-card { 
+        background: white; 
+        border: 1px solid #e0e0e0; 
+        border-radius: 8px; 
+        padding: 25px; 
+        margin-bottom: 20px;
+    }
+    .detail-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; }
+    .detail-title { font-size: 1.5em; font-weight: bold; color: #333; margin: 0; }
+    .status-badge { 
+        padding: 6px 15px; 
+        border-radius: 20px; 
+        font-size: 0.9em; 
+        font-weight: bold; 
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+    .detail-section { margin-bottom: 20px; }
+    .detail-section h3 { color: #333; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .detail-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+        gap: 15px; 
+        margin-bottom: 15px;
+    }
+    .detail-item { padding: 10px; background: #f8f9fa; border-radius: 5px; }
+    .detail-label { font-weight: bold; color: #555; display: block; }
+    .detail-value { color: #333; }
+    .btn { 
+        padding: 10px 20px; 
+        text-decoration: none; 
+        border-radius: 5px; 
+        display: inline-block; 
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-success { background: #28a745; color: white; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+        <a href="{{ url_for('pin_my_requests') }}" class="btn btn-secondary">← Back to My Requests</a>
+    </div>
+    
+    <div class="detail-card">
+        <div class="detail-header">
+            <h1 class="detail-title">{{ request.title }}</h1>
+            <span class="status-badge status-{{ request.status }}">
+                {{ request.status|title }}
+            </span>
+        </div>
+
+        <div class="detail-section">
+            <h3>Request Information</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Service Type</span>
+                    <span class="detail-value">{{ request.service_type|title if request.service_type else 'Not specified' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value">{{ request.location if request.location else 'Not specified' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Urgency</span>
+                    <span class="detail-value">{{ request.urgency|title if request.urgency else 'Medium' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">{{ request.status|title }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Description</h3>
+            <p style="line-height: 1.6; color: #555;">{{ request.description }}</p>
+        </div>
+
+        {% if request.skills_required %}
+        <div class="detail-section">
+            <h3>Skills Required</h3>
+            <p style="color: #555;">{{ request.skills_required }}</p>
+        </div>
+        {% endif %}
+
+        <div class="detail-section">
+            <h3>Timeline</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Start Date</span>
+                    <span class="detail-value">{{ request.start_date.strftime('%Y-%m-%d') if request.start_date else 'Not specified' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">End Date</span>
+                    <span class="detail-value">{{ request.end_date.strftime('%Y-%m-%d') if request.end_date else 'Not specified' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Created</span>
+                    <span class="detail-value">{{ request.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Updated</span>
+                    <span class="detail-value">{{ request.updated_at.strftime('%Y-%m-%d %H:%M') if request.updated_at else 'Never' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Engagement Metrics</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Views</span>
+                    <span class="detail-value">{{ request.view_count }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Volunteers Interested</span>
+                    <span class="detail-value">{{ request.shortlist_count }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('pin_my_requests') }}" class="btn btn-secondary">Back to Requests</a>
+            
+            {% if request.status == 'pending' %}
+            <form method="POST" action="{{ url_for('pin_activate_request', request_id=request.request_id) }}" style="display: inline;">
+                <button type="submit" class="btn btn-success">
+                    Activate Request
+                </button>
+            </form>
+            {% endif %}
+            
+            {% if request.status == 'active' %}
+            <form method="POST" action="{{ url_for('pin_complete_request', request_id=request.request_id) }}" style="display: inline;">
+                <button type="submit" class="btn btn-success" onclick="return confirm('Mark this request as completed?')">
+                    Mark as Completed
+                </button>
+            </form>
+            {% endif %}
+            
+            <a href="{{ url_for('pin_request_history') }}" class="btn btn-primary">View History</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
