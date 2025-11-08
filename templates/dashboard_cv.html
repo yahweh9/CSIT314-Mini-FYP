@@ -3,9 +3,7 @@
 {% block head %}
 <title>CV Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css')}}">
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
 
@@ -13,15 +11,37 @@
 <div class="cv-dashboard">
     <h1>CV Dashboard</h1>
     <div class="header-options">
-        <a href="{{ url_for('history_cv') }}">History</a>
-        <a href="{{ url_for('cv_account_info') }}">Account</a>
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        <a class=nav-bar-options href="{{ url_for('history_cv') }}">History</a>
+        <a class=nav-bar-options href="{{ url_for('cv_account_info') }}">Account</a>
+        <a class=nav-bar-options href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
 </div>
 <div class="welcome-message">
     <h3>Welcome, {{ user.fullname }}. View your assigned request(s) below.</h3>
 </div>
-<div>
+<div class="sort-options">
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-sm-4">
+            <label class="form-label">Sort by</label>
+            <select name="sort" class="form-select">
+            <option value="">Default</option>
+            <option value="end_date_asc"  {{ 'selected' if request.args.get('sort')=='end_date_asc' }}>Deadline (Ascending)</option>
+            <option value="end_date_desc" {{ 'selected' if request.args.get('sort')=='end_date_desc' }}>Deadline (Descending)</option>
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label class="form-label">Filter Urgency</label>
+            <select name="urgency" class="form-select">
+            <option value="">All</option>
+            <option value="high"   {{ 'selected' if request.args.get('urgency')=='high' }}>High</option>
+            <option value="medium" {{ 'selected' if request.args.get('urgency')=='medium' }}>Medium</option>
+            <option value="low"    {{ 'selected' if request.args.get('urgency')=='low' }}>Low</option>
+            </select>
+        </div>
+        <div class="col-sm-4 align-self-end">
+            <button class="btn btn-secondary w-100" type="submit">Apply</button>
+        </div>
+    </form>
     {% if requests %}
     <table class="my-table">
         <tr>
@@ -30,7 +50,8 @@
             <th>Name</th>
             <th>Location</th>
             <th>Status</th>
-            
+            <th>Urgency</th>
+            <th>Deadline</th>
             <th>View Details</th>
         </tr>
 
@@ -45,7 +66,12 @@
                     {{ req.status }}
                 </span>
             </td>
-            
+            <td>
+                <span class="urgency-badge {{ req.urgency|lower }}">
+                    {{ req.urgency }}
+                </span>
+            </td>
+            <td>{{ req.end_date.strftime('%d/%m/%Y %H:%M') }}</td>
             <td>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestModal{{ req.request_id }}">
                     Details
@@ -97,7 +123,7 @@
 
 
     {% else %}
-    <p class="no-requests-message">No active or pending requests assigned to you.</p>
+    <p class="no-requests-message">No requests found. If you have filters applied, try resetting them or applying a different one.</p>
     {% endif %}
 </div>
 {% endblock %}

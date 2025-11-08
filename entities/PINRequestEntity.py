@@ -10,6 +10,7 @@ class PINRequestEntity(db.Model):
     title = db.Column(db.String(100), nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
+    completed_date = db.Column(db.DateTime) # Date that CV completed the request
     description = db.Column(db.Text)
     
     # Service details - MAKE SURE THESE EXIST
@@ -23,7 +24,7 @@ class PINRequestEntity(db.Model):
     assigned_by_id = db.Column(db.Integer)
     
     # Tracking metrics  
-    status = db.Column(db.String(20), default='pending')
+    status = db.Column(db.String(20), default='pending') # [pending, active, completed]
     view_count = db.Column(db.Integer, default=0)
     shortlist_count = db.Column(db.Integer, default=0)
     

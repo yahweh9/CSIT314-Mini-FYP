@@ -167,6 +167,21 @@ def seed_database():
             
             title = f"{random.choice(titles)} #{i}"
 
+            # Generate completed_date ONLY if status is 'completed'
+            completed_date = None
+            if status == "completed":
+                # Completion must be before today and after start_date
+                latest_possible = min(end_date, datetime.utcnow())  # can't exceed now
+                earliest_possible = start_date + timedelta(hours=1) # ensure logical sequence
+
+                # If end_date is already in the future, make sure completed_date ≤ now
+                if earliest_possible > latest_possible:
+                    earliest_possible = latest_possible - timedelta(hours=1)
+
+                # Randomly pick a date between earliest_possible and latest_possible
+                delta_seconds = int((latest_possible - earliest_possible).total_seconds())
+                completed_date = earliest_possible + timedelta(seconds=random.randint(0, delta_seconds))
+
             request = PINRequestEntity(
                 requested_by_id=pin.user_id,
                 assigned_to_id=assigned_cv_id,
@@ -174,6 +189,7 @@ def seed_database():
                 title=title,
                 start_date=start_date,
                 end_date=end_date,
+                completed_date=completed_date,
                 location=pin.address,
                 description=f"Provide assistance to {pin.fullname} at {pin.address}",
                 status=status,

@@ -1,31 +1,47 @@
 # controllers/CVRequestController.py
 from datetime import datetime
 from flask import request, session, redirect, url_for, render_template
+from sqlalchemy import func
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
+
 
 class RequestController:
     
     # Get all requests that a CV has yet to complete (status is 'pending' or 'active')
     @staticmethod
-    def get_incomplete_requests(cv):
-        
-        # Auto-mark expired requests
+    def get_incomplete_requests(cv, urgency=None, sort=None):
+        # Only expire assigned ones (optional; safer)
         now = datetime.utcnow()
-        for req in PINRequestEntity.query.filter(PINRequestEntity.status.in_(["pending", "active"])).all():
-            if req.end_date < now:
-                req.status = "expired"
+        to_expire = (PINRequestEntity.query
+                     .filter(PINRequestEntity.assigned_to_id == cv.user_id,
+                             PINRequestEntity.status.in_(["pending", "active"]),
+                             PINRequestEntity.end_date < now)
+                     .all())
+        for r in to_expire:
+            r.status = "expired"
         db.session.commit()
 
-        # get PIN requests assigned to this CV that are pending or active
-        assigned_requests = (
-            PINRequestEntity.query
-            .filter(
-                PINRequestEntity.assigned_to_id == cv.user_id,
-                PINRequestEntity.status.in_(["pending", "active"])
-            )
-            .all()
-        )
+        q = (PINRequestEntity.query
+             .filter(PINRequestEntity.assigned_to_id == cv.user_id,
+                     PINRequestEntity.status.in_(["pending", "active"])))
+
+        # filter urgency only if provided
+        if urgency:
+            q = q.filter(func.lower(PINRequestEntity.urgency) == urgency.lower())
+
+        # sort if requested
+        if sort == "end_date_asc":
+            q = q.order_by(PINRequestEntity.end_date.asc())
+        elif sort == "end_date_desc":
+            q = q.order_by(PINRequestEntity.end_date.desc())
+
+        assigned_requests = q.all()
+
+        # attach PIN name
+        for req in assigned_requests:
+            pin_user = UserEntity.query.get(req.requested_by_id)
+            req.pin_name = pin_user.fullname if pin_user else "Unknown"
 
         return assigned_requests
 

@@ -2,7 +2,7 @@ from flask import Flask, jsonify, render_template, url_for, request, redirect, s
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Boundaries
+# BOUNDARIES
 from boundaries.web_page import display_login_page, display_register_admin, display_successful_registration
 from boundaries.pin_page import display_dashboard_pin
 from boundaries.csrrep_page import display_dashboard_csrrep
@@ -20,7 +20,7 @@ from boundaries.pin_request_boundary import (
     display_request_detail
 )
 
-# Controllers
+# CONTROLLERS
 from controllers.LoginController import LoginController
 from controllers.RegisterController import RegisterController
 from controllers.RequestController import RequestController
@@ -30,7 +30,7 @@ from controllers.LogoutController import LogoutController
 from controllers.FeedbackController import FeedbackController
 from controllers.PINRequestController import PINRequestController
 
-# Entities
+# ENTITIES
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
 from entities.FeedbackEntity import FeedbackEntity
@@ -257,26 +257,17 @@ def fix_completed_requests():
 # CV REQUEST MANAGEMENT ROUTES
 @app.route('/dashboard_cv/accept/<string:request_id>', methods=['POST'])
 def accept_request(request_id):
-    req = PINRequestEntity.query.filter_by(request_id=request_id).first()
-    if req and req.status == 'pending':
-        req.status = 'active'
-        db.session.commit()
+    PINRequestController.accept_request(request_id)
     return redirect(url_for('dashboard_cv'))
 
 @app.route('/dashboard_cv/reject/<string:request_id>', methods=['POST'])
 def reject_request(request_id):
-    req = PINRequestEntity.query.filter_by(request_id=request_id).first()
-    if req and req.status == 'pending':
-        db.session.delete(req)
-        db.session.commit()
+    PINRequestController.reject_request(request_id)
     return redirect(url_for('dashboard_cv'))
 
 @app.route('/cv/complete/<string:request_id>', methods=['POST'])
 def complete_request(request_id):
-    req = PINRequestEntity.query.filter_by(request_id=request_id).first()
-    if req and req.status == 'active':
-        req.status = 'completed'
-        db.session.commit()
+    PINRequestController.complete_request(request_id)
     return redirect(url_for('dashboard_cv'))
 
 @app.route('/cv_account_info')

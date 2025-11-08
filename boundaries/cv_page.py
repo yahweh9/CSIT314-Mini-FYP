@@ -11,7 +11,10 @@ def display_dashboard_cv():
 
     cv = UserEntity.query.filter_by(username=session['username'], role='cv').first()
 
-    assigned_requests = RequestController.get_incomplete_requests(cv)
+    urgency = request.args.get('urgency')
+    sort = request.args.get('sort')
+
+    assigned_requests = RequestController.get_incomplete_requests(cv, urgency=urgency, sort=sort)
 
     return render_template('dashboard_cv.html', user=cv, requests=assigned_requests)
 

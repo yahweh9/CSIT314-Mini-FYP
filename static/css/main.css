@@ -24,6 +24,7 @@ body {
     justify-content: space-between; 
 }
 
+
 .cv-account {
     margin: 0px;
     padding: 0px;
@@ -78,7 +79,12 @@ body {
     font-weight: 670;
     padding: 15px;
     color: #ffffff;
-    text-decoration: none;   
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.header-options a:hover {
+    color: #ffd166;
 }
 
 .main-header a:hover, .dashboard a:hover{
@@ -125,6 +131,12 @@ body {
     padding: 5px 12px
 }
 
+.sort-options {
+    padding: 20px;
+    max-width: 900px; 
+    margin: 0 auto;
+}
+
 .my-table {
   border-collapse: collapse;
   width: 70%;
@@ -167,21 +179,39 @@ body {
     color: white;
     text-transform: capitalize;
 }
-
 /* Different colors for each status */
 .status-badge.pending {
     background-color: #f1c40f; /* yellow */
 }
-
 .status-badge.active {
     background-color: #2ecc71; /* green */
 }
-
 .status-badge.completed {
     background-color: #95a5a6; /* grey */
 }
-
 .status-badge.expired {
+    background-color: #e74c3c; /* red */
+}
+
+
+.urgency-badge {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+    color: white;
+    text-transform: capitalize;
+}
+/* Different colors for each status */
+.urgency-badge.medium {
+    background-color: #f1c40f; /* yellow */
+}
+.urgency-badge.low {
+    background-color: #01b64c; /* green */
+}
+.urgency-badge.completed {
+    background-color: #95a5a6; /* grey */
+}
+.urgency-badge.high {
     background-color: #e74c3c; /* red */
 }
 
