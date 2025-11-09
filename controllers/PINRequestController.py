@@ -121,46 +121,4 @@ class PINRequestController:
             return True
         return False
     
-    # Set request status to 'active'
-    def accept_request(request_id):
-        try:
-            req = PINRequestEntity.query.filter_by(request_id=request_id).first()
-            if req and req.status == 'pending':
-                req.status = 'active'
-                db.session.commit()
-                return True
-            return False
 
-        except Exception as e:
-            db.session.rollback()
-            print("Error:", e)
-            return False
-        
-
-    def reject_request(request_id):
-        try:
-            req = PINRequestEntity.query.filter_by(request_id=request_id).first()
-            if req and req.status == 'pending':
-                db.session.delete(req)
-                db.session.commit()
-                return True
-            return False
-        
-        except Exception as e:
-            db.session.rollback()
-            print("Error:", e)
-            return False
-        
-    def complete_request(request_id):
-        try:
-            req = PINRequestEntity.query.filter_by(request_id=request_id).first()
-            if req and req.status == 'active':
-                req.status = 'completed'
-                db.session.commit()
-                return True
-            return False
-        
-        except Exception as e:
-            db.session.rollback()
-            print("Error:", e)
-            return False

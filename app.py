@@ -29,6 +29,7 @@ from controllers.LogoutController import LogoutController
 # PIN Feature Controllers
 from controllers.FeedbackController import FeedbackController
 from controllers.PINRequestController import PINRequestController
+from controllers.RequestController import RequestController
 
 # ENTITIES
 from entities.UserEntity import db, UserEntity
@@ -257,17 +258,17 @@ def fix_completed_requests():
 # CV REQUEST MANAGEMENT ROUTES
 @app.route('/dashboard_cv/accept/<string:request_id>', methods=['POST'])
 def accept_request(request_id):
-    PINRequestController.accept_request(request_id)
+    RequestController.accept_request(request_id)
     return redirect(url_for('dashboard_cv'))
 
 @app.route('/dashboard_cv/reject/<string:request_id>', methods=['POST'])
 def reject_request(request_id):
-    PINRequestController.reject_request(request_id)
+    RequestController.reject_request(request_id)
     return redirect(url_for('dashboard_cv'))
 
 @app.route('/cv/complete/<string:request_id>', methods=['POST'])
 def complete_request(request_id):
-    PINRequestController.complete_request(request_id)
+    RequestController.complete_request(request_id)
     return redirect(url_for('dashboard_cv'))
 
 @app.route('/cv_account_info')

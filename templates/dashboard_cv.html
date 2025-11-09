@@ -25,8 +25,17 @@
             <label class="form-label">Sort by</label>
             <select name="sort" class="form-select">
             <option value="">Default</option>
-            <option value="end_date_asc"  {{ 'selected' if request.args.get('sort')=='end_date_asc' }}>Deadline (Ascending)</option>
-            <option value="end_date_desc" {{ 'selected' if request.args.get('sort')=='end_date_desc' }}>Deadline (Descending)</option>
+            <option value="end_date_asc"  {{ 'selected' if request.args.get('sort')=='end_date_asc' }}>Deadline (Earliest First)</option>
+            <option value="end_date_desc" {{ 'selected' if request.args.get('sort')=='end_date_desc' }}>Deadline (Latest First)</option>
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label class="form-label">Filter Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                <option value="pending"  {{ 'selected' if request.args.get('status')=='pending' }}>Pending</option>
+                <option value="active"   {{ 'selected' if request.args.get('status')=='active' }}>Active</option>
+                <option value="late"     {{ 'selected' if request.args.get('status')=='late' }}>Late</option>
             </select>
         </div>
         <div class="col-sm-4">
@@ -38,8 +47,9 @@
             <option value="low"    {{ 'selected' if request.args.get('urgency')=='low' }}>Low</option>
             </select>
         </div>
+        <div class="col-sm-4"></div>
         <div class="col-sm-4 align-self-end">
-            <button class="btn btn-secondary w-100" type="submit">Apply</button>
+            <button class="btn btn-secondary w-100" type="submit">Apply Sort/Filter Options</button>
         </div>
     </form>
     {% if requests %}
@@ -110,7 +120,7 @@
                         <form action="{{ url_for('reject_request', request_id=req.request_id) }}" method="post">
                             <button type="submit" class="btn btn-danger">Reject</button>
                         </form>
-                        {% elif req.status == 'active' %}
+                        {% elif req.status == 'active' or req.status == 'late' %}
                         <form action="{{ url_for('complete_request', request_id=req.request_id) }}" method="post">
                             <button type="submit" class="btn btn-primary">Mark as Completed</button>
                         </form>

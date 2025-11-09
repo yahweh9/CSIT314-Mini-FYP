@@ -186,13 +186,12 @@ body {
 .status-badge.active {
     background-color: #2ecc71; /* green */
 }
+.status-badge.late {
+    background-color: #e74c3c; /* red */
+}
 .status-badge.completed {
     background-color: #95a5a6; /* grey */
 }
-.status-badge.expired {
-    background-color: #e74c3c; /* red */
-}
-
 
 .urgency-badge {
     padding: 6px 12px;
