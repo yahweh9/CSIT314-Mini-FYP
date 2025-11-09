@@ -171,6 +171,9 @@ body {
 .my-table tr:nth-child(even) {
   background-color: #f4fafa;
 }
+.cv-service-type {
+    text-transform: capitalize;
+}
 
 .status-badge {
     padding: 6px 12px;
