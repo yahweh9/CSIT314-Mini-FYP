@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 text-center">
+  <h2>Volunteer Successfully Assigned!</h2>
+  <p>Your match has been created. Match ID: <b>{{ match_id }}</b></p>
+  <a href="{{ url_for('csr.match_page') }}" class="btn btn-primary mt-3">Return to Matching</a>
+</div>
+{% endblock %}

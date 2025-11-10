@@ -1,4 +1,9 @@
 # controllers/CVRequestController.py
+from flask import request, session, flash
+from typing import List
+
+from entities.MatchEntity import MatchEntity
+
 from datetime import datetime, timedelta
 from flask import request, session, redirect, url_for, render_template
 from sqlalchemy import func
@@ -133,3 +138,84 @@ class RequestController:
             db.session.rollback()
             print("Error:", e)
             return False
+
+    @staticmethod
+    def normalize_skills(value):
+        if not value:
+            return []
+        if isinstance(value, list):
+            return [v.lower().strip() for v in value]
+        return [v.lower().strip() for v in str(value).replace(';', ',').split(',') if v.strip()]
+
+
+    # EDITED NAME TO 'open'
+    @staticmethod
+    def get_open_requests() -> List[PINRequestEntity]:
+        return (PINRequestEntity.query
+                .filter(PINRequestEntity.status.in_(['open', 'pending']))
+                .all())
+
+    @staticmethod
+    def find_candidates(pin_id: int) -> List[UserEntity]:
+        pin = PINRequestEntity.query.get(pin_id)
+        if not pin:
+            return []
+        req_skills = RequestController.normalize_skills(getattr(pin, 'required_skills', ''))
+        pin_loc = getattr(pin, 'location', '').lower()
+        candidates = (UserEntity.query
+                    .filter(UserEntity.role == 'volunteer', UserEntity.status == 'active')
+                    .all())
+        matched = []
+        for u in candidates:
+            skills = RequestController.normalize_skills(getattr(u, 'skills', ''))
+            if any(s in skills for s in req_skills) or getattr(u, 'location', '').lower() == pin_loc:
+                matched.append(u)
+        return matched
+
+    @staticmethod
+    def rank_candidates(pin_id: int, users: List[UserEntity]) -> List[UserEntity]:
+        pin = PINRequestEntity.query.get(pin_id)
+        if not pin:
+            return users
+        req_skills = RequestController.normalize_skills(getattr(pin, 'required_skills', ''))
+        pin_loc = getattr(pin, 'location', '').lower()
+        def score(u: UserEntity):
+            overlap = len(set(req_skills) & set(RequestController.normalize_skills(getattr(u, 'skills', ''))))
+            loc_score = 1 if getattr(u, 'location', '').lower() == pin_loc else 0
+            return overlap * 10 + loc_score
+        return sorted(users, key=score, reverse=True)
+
+    @staticmethod
+    def assign_user(pin_id: int, user_id: int) -> MatchEntity | None:
+        pin = PINRequestEntity.query.get(pin_id)
+        user = UserEntity.query.get(user_id)
+        if not pin or not user:
+            return None
+        match = MatchEntity(pin_request_id=pin.request_id, user_id=user.user_id, status='confirmed')
+        db.session.add(match)
+        pin.status = 'fulfilled'
+        db.session.add(pin)
+        db.session.commit()
+        return match
+
+    @staticmethod
+    def notify_parties(match: MatchEntity):
+        print(f"[Notify] Match #{match.match_id} created for PIN {match.pin_request_id} and User {match.user_id}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

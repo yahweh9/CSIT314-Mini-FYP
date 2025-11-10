@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>PIN Request Details</h2>
+  {% if pin %}
+  <p><b>Title:</b> {{ pin.title }}</p>
+  <p><b>Location:</b> {{ pin.location }}</p>
+  <p><b>Required Skills:</b> {{ pin.required_skills }}</p>
+  <p><b>Status:</b> {{ pin.status }}</p>
+  <a href="{{ url_for('csr.view_candidates', pin_id=pin.request_id) }}" class="btn btn-success">View Candidates</a>
+  {% else %}
+  <p>No request found.</p>
+  {% endif %}
+  <a href="{{ url_for('csr.match_page') }}" class="btn btn-secondary mt-3">Back</a>
+</div>
+{% endblock %}

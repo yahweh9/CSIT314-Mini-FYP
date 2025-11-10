@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Match Volunteers to PIN Requests</h2>
+  <table class="table table-striped mt-3">
+    <thead><tr><th>ID</th><th>Title</th><th>Location</th><th>Skills</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for p in pins %}
+      <tr>
+        <td>{{ p.request_id }}</td>
+        <td>{{ p.title }}</td>
+        <td>{{ p.location }}</td>
+        <td>{{ p.required_skills }}</td>
+        <td>{{ p.status }}</td>
+        <td>
+          <a href="{{ url_for('csr.view_pin', pin_id=p.request_id) }}" class="btn btn-sm btn-info">View</a>
+          <a href="{{ url_for('csr.view_candidates', pin_id=p.request_id) }}" class="btn btn-sm btn-success">Match</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
