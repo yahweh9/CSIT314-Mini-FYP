@@ -43,3 +43,27 @@ class PINRequestEntity(db.Model):
 
     def __repr__(self):
         return f"<PINRequest(id={self.request_id}, title='{self.title}', status='{self.status}')>"
+    
+    def mark_as_late(self):
+        """Mark the request as late."""
+        self.status = "late"
+
+    def is_late(self):
+        """True if past deadline and still active."""
+        from datetime import datetime
+        return self.status == "active" and self.end_date < datetime.utcnow()
+
+    def matches_status(self, status):
+        """Check if request matches a given status."""
+        return self.status == status
+
+    def matches_urgency(self, urgency):
+        """Case-insensitive urgency check."""
+        return self.urgency.lower() == urgency.lower()
+
+    @staticmethod
+    def sort_by_end_date(query, direction="asc"):
+        """Apply sorting to a SQLAlchemy query."""
+        if direction == "asc":
+            return query.order_by(PINRequestEntity.end_date.asc())
+        return query.order_by(PINRequestEntity.end_date.desc())

@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from entities.UserEntity import db
 from entities.FeedbackEntity import FeedbackEntity
 from entities.PINRequestEntity import PINRequestEntity
+from entities.CorporateVolunteerEntity import CorporateVolunteerEntity
 from entities.UserEntity import UserEntity
+from controllers.RequestController import RequestController
 
 class FeedbackController:
     
@@ -395,3 +397,24 @@ class FeedbackController:
         
         total_rating = sum(fb.rating for fb in feedbacks)
         return round(total_rating / len(feedbacks), 1)
+    
+    @staticmethod
+    def get_average_rating_cv(cv):
+
+        # Get completed request of cv
+        completed_requests = RequestController.get_request_history(cv)
+
+        # Compile all ratings of cv_id into total_ratings and rating_count
+        total = 0
+        count = 0
+
+        for req in completed_requests:
+            rating = FeedbackEntity.get_feedback_rating(req.request_id)
+
+            if rating is not None:
+                total += rating
+                count += 1
+
+        return round(total / count, 2) if count > 0 else None
+
+  

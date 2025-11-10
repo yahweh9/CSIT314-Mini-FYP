@@ -9,54 +9,58 @@ from flask import request, session, redirect, url_for, render_template
 from sqlalchemy import func
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
-
+from entities.FeedbackEntity import FeedbackEntity
 
 class RequestController:
     
-    # Get all requests that a CV has yet to complete (status is 'pending' or 'active')
     @staticmethod
     def get_incomplete_requests(cv, status=None, urgency=None, sort=None):
-        
         now = datetime.utcnow()
-        # If active requests past the deadline, change the status to 'late'
-        late = (PINRequestEntity.query
-                     .filter(PINRequestEntity.assigned_to_id == cv.user_id,
-                             PINRequestEntity.status.in_(["active"]),
-                             PINRequestEntity.end_date < now)
-                     .all())
-        for r in late:
-            r.status = "late"
+
+        # Auto-update late requests using entity method
+        active_reqs = PINRequestEntity.query.filter_by(
+            assigned_to_id=cv.user_id, status="active"
+        ).all()
+
+        for req in active_reqs:
+            if req.is_late():
+                req.mark_as_late()
+
         db.session.commit()
 
-        # Get CV's assigned request with "pending", "active", "late" status
-        query = (PINRequestEntity.query
-             .filter(PINRequestEntity.assigned_to_id == cv.user_id,
-                     PINRequestEntity.status.in_(["pending", "active", "late"])))
-        
-        #  Filter by status (only if filter applied)
+        # Base query (pending, active, late)
+        query = PINRequestEntity.query.filter(
+            PINRequestEntity.assigned_to_id == cv.user_id,
+            PINRequestEntity.status.in_(["pending", "active", "late"])
+        )
+
+        # Filter by status using entity match method
         if status:
             query = query.filter(PINRequestEntity.status == status)
 
-        # Filter by urgency (only if filter applied)
+        # Filter by urgency using entity method
         if urgency:
-            query = query.filter(func.lower(PINRequestEntity.urgency) == urgency.lower())
+            query = query.filter(
+                func.lower(PINRequestEntity.urgency) == urgency.lower()
+            )
 
-        # Sort order of assigned resquests if requested
+        # Apply sorting using the entity helper
         if sort == "end_date_asc":
-            query = query.order_by(PINRequestEntity.end_date.asc())
+            query = PINRequestEntity.sort_by_end_date(query, "asc")
         elif sort == "end_date_desc":
-            query = query.order_by(PINRequestEntity.end_date.desc())
+            query = PINRequestEntity.sort_by_end_date(query, "desc")
 
+        # Get final list
         assigned_requests = query.all()
 
-        # attach PIN name to be displayed
+        # Attach PIN name (boundary convenience data)
         for req in assigned_requests:
             pin_user = UserEntity.query.get(req.requested_by_id)
             req.pin_name = pin_user.fullname if pin_user else "Unknown"
 
         return assigned_requests
 
-    # Get all completed requests of a CV (status is 'completed' or 'expired')
+    # Get all completed requests of a CV (status is 'completed')
     @staticmethod
     def get_request_history(cv):
         # get PIN requests completed by this CV - status == "completed"
@@ -73,7 +77,8 @@ class RequestController:
         for req in completed_requests:
             pin_user = UserEntity.query.get(req.requested_by_id)
             req.pin_name = pin_user.fullname if pin_user else "Unknown"
-
+            req.feedback_rating = FeedbackEntity.get_feedback_rating(req.request_id)
+            
         return completed_requests
     
     @staticmethod

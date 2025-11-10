@@ -23,3 +23,9 @@ class FeedbackEntity(db.Model):
 
     def __repr__(self):
         return f"<Feedback {self.feedback_id} for request {self.request_id}>"
+    
+    @classmethod
+    def get_feedback_rating(cls, request_id):
+        """Return the rating for a given request_id, or None if no feedback exists."""
+        feedback = cls.query.filter_by(request_id=request_id).first()
+        return feedback.rating if feedback else None

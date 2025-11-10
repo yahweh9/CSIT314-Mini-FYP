@@ -4,6 +4,7 @@ from flask import request, session, redirect, url_for, render_template
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
 from controllers.RequestController import RequestController
+from controllers.FeedbackController import FeedbackController
 
 def display_dashboard_cv():
     if 'username' not in session:
@@ -37,8 +38,8 @@ def display_report_page():
 
     cv = UserEntity.query.filter_by(username=session['username'], role='cv').first()
     completed_requests = RequestController.get_request_history(cv)
-
-    return render_template('cv_report.html', user=cv, requests=completed_requests)
+    avg_rating = FeedbackController.get_average_rating_cv(cv)
+    return render_template('cv_report.html', user=cv, requests=completed_requests, avg_rating = avg_rating)
 
 def display_account_page():
     if 'username' not in session:

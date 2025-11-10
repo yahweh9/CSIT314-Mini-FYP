@@ -171,6 +171,48 @@ body {
 .my-table tr:nth-child(even) {
   background-color: #f4fafa;
 }
+
+/* Ensure rating stars stay in one line for CV history */
+.star-rating {
+    white-space: nowrap;
+}
+
+.cv-report-table {
+  border-collapse: collapse;
+  width: 90%;
+  margin: 30px auto;
+  background-color: #ffffff;
+  color: #00474f;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cv-report-table th {
+  background-color: #00787c;
+  color: white;
+  text-align: left;
+  padding: 14px;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+.cv-report-table td {
+  padding: 12px;
+  border-bottom: 1px solid #d6d6d6;
+  font-size: 16px;
+}
+
+.cv-report-table tr:hover {
+  background-color: #e7f7f7;
+  transition: 0.3s;
+}
+
+.cv-report-table tr:nth-child(even) {
+  background-color: #f4fafa;
+}
+
+
 .cv-service-type {
     text-transform: capitalize;
 }
@@ -294,6 +336,29 @@ body {
     background-color: #09666e;
 }
 
+.print-btn {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.print-btn:hover {
+    background-color: #0d8a96;
+    transform: translateY(-2px);
+}
+
+.print-btn:active {
+    transform: translateY(0);
+    background-color: #09666e;
+}
+
 /* Improved heading colors for better readability */
 .dashboard h1,
 .cv-dashboard h1,
@@ -335,17 +400,45 @@ body {
 
 @media print {
   body {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     background-color: rgb(113, 189, 192) !important;
     color: #000 !important; /* <-- Make text visible on light background */
   }
 
-  h1, h2, h3, p, th, td {
-    color: #000000 !important; /* ensures all text turns black when printing */
+  h1, h2, h3, p, td {
+    color: #111111 !important;
+
+  }
+  
+  th {
+    color: #ffffff !important; /* ensures all text turns black when printing */
   }
 
   .print-btn {
     display: none; /* hides download button in print */
   }
+
+    /* Prevent row splitting */
+    tr, td, th {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Repeat header each page */
+    thead {
+        display: table-header-group !important;
+    }
+    tfoot {
+        display: table-footer-group !important;
+    }
+
+    /* Optional: prevent container splitting */
+    .report-table-wrapper {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        page-break-inside: avoid !important;
+    }
 }

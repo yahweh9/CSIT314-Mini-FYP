@@ -4,9 +4,7 @@
 <title>Completed Request History</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css')}}">
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
@@ -30,10 +28,11 @@
         <tr>
             <th>Request ID</th>
             <th>Title</th>
-            <th>Name</th>
-            <th>Location</th>
+            <th>Service Cateogry</th>
+            <th>PIN Name</th>
             <th>Status</th>
             <th>Completed Date</th>
+            <th>Rating</th>
             <th>View Details</th>
         </tr>
 
@@ -41,8 +40,8 @@
         <tr>
             <td>{{ req.request_id }}</td>
             <td>{{ req.title }}</td>
+            <td class="cv-service-type">{{ req.service_type }}</td>
             <td>{{ req.pin_name }}</td>
-            <td>{{ req.location }}</td>
             <td>
                 <span class="status-badge {{ req.status|lower }}">
                     {{ req.status }}
@@ -53,6 +52,20 @@
                     {{ req.completed_date.strftime('%d/%m/%Y %H:%M') }}
                 {% else %}
                     —
+                {% endif %}
+            </td>
+            <td>
+                {% if req.feedback_rating %}
+                    <span class="star-rating">
+                        {% for i in range(req.feedback_rating) %}
+                            ★
+                        {% endfor %}
+                        {% for i in range(5 - req.feedback_rating) %}
+                            ☆
+                        {% endfor %}
+                    </span>
+                {% else %}
+                    No rating
                 {% endif %}
             </td>
             <td>
