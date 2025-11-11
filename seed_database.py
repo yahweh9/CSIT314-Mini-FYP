@@ -2,15 +2,49 @@
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import random
+
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
+from entities.VolunteerServiceCategoryEntity import VolunteerServiceCategoryEntity as VCat
+
+def _seed_categories_if_empty():
+    """Seed dynamic categories derived from realistic activity types."""
+    from entities.VolunteerServiceCategoryEntity import VolunteerServiceCategoryEntity as VCat
+
+    if VCat.query.count() == 0:
+        category_names = [
+            "Food Donation Drive",
+            "Community Clean-Up",
+            "Health Awareness Event",
+            "Elderly Home Visit",
+            "Fundraising Campaign",
+            "Recycling Workshop",
+            "Beach Cleanup",
+            "Tree Planting Activity",
+            "Charity Walk",
+            "Blood Donation Support"
+        ]
+        for name in category_names:
+            db.session.add(VCat(
+                name=name,
+                description=f"Activities related to {name.lower()}",
+                is_active=True
+            ))
+        db.session.commit()
+        print(f"🌱 Seeded {len(category_names)} volunteer service categories.")
+
 
 def seed_database():
     """Seed the database with initial test data"""
-    
-    # Clear existing data
+
+    # ---- Wipe tables we control (idempotent-ish for dev) ----
+    # Order matters if you later add FKs; for now we clear requests then users.
+    db.session.query(PINRequestEntity).delete()
     db.session.query(UserEntity).delete()
-    
+
+    # ---- Ensure categories exist BEFORE creating requests ----
+    _seed_categories_if_empty()
+
     # Sample data generators
     companies = ["TechCorp Inc", "GreenEnergy Ltd", "FutureSolutions Co", "GlobalImpact Corp", "InnovateWorks"]
     departments = ["Engineering", "Marketing", "HR", "Finance", "Operations", "Sales", "IT"]
@@ -18,8 +52,8 @@ def seed_database():
         "123 Main St, Sydney", "456 Oak Ave, Melbourne", "789 Pine Rd, Brisbane",
         "321 Elm St, Perth", "654 Maple Dr, Adelaide", "987 Birch Ln, Canberra"
     ]
-    
-    # 1. Platform Manager (seeded once)
+
+    # 1) Platform Manager
     pm = UserEntity(
         username='pm001',
         password=generate_password_hash('pm001'),
@@ -30,8 +64,8 @@ def seed_database():
         created_at=datetime.utcnow()
     )
     db.session.add(pm)
-    
-    # 2. User Admins (created by Platform Manager)
+
+    # 2) Admins
     admins = [
         UserEntity(
             username='admin1',
@@ -52,13 +86,12 @@ def seed_database():
             created_at=datetime.utcnow() - timedelta(days=5)
         )
     ]
-    for admin in admins:
-        db.session.add(admin)
-    
-    # 3. CSR Representatives (created by Admins) - Limited accounts
+    db.session.add_all(admins)
+
+    # 3) CSR Reps
     csr_reps = []
-    for i in range(1, 6):  # 5 CSR Reps
-        company = companies[i-1]
+    for i in range(1, 6):
+        company = companies[i - 1]
         csr_rep = UserEntity(
             username=f'csr_rep{i}',
             password=generate_password_hash(f'csrrep{i}'),
@@ -71,18 +104,16 @@ def seed_database():
         )
         csr_reps.append(csr_rep)
         db.session.add(csr_rep)
-    
-    # 4. Corporate Volunteers (self-registered, need approval)
+
+    # 4) Corporate Volunteers
     corporate_volunteers = []
     first_names = ["John", "Jane", "Mike", "Sarah", "David", "Lisa", "Robert", "Emily", "Michael", "Jessica"]
     last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"]
-    
-    for i in range(1, 51):  # 50 Corporate Volunteers
+    for i in range(1, 51):
         first_name = random.choice(first_names)
         last_name = random.choice(last_names)
         company = random.choice(companies)
         department = random.choice(departments)
-        
         cv = UserEntity(
             username=f'cv_{first_name.lower()}{i}',
             password=generate_password_hash(f'cvpassword{i}'),
@@ -91,22 +122,20 @@ def seed_database():
             email=f'{first_name.lower()}.{last_name.lower()}@{company.lower().replace(" ", "")}.com',
             company=company,
             department=department,
-            status='active' if i % 5 != 0 else 'pending',  # 80% approved, 20% pending
+            status='active' if i % 5 != 0 else 'pending',
             created_at=datetime.utcnow() - timedelta(days=random.randint(1, 60))
         )
         corporate_volunteers.append(cv)
         db.session.add(cv)
-    
-    # 5. Persons in Need (self-registered, need approval)
+
+    # 5) Persons in Need
     pin_users = []
     pin_first_names = ["James", "Mary", "William", "Patricia", "Richard", "Jennifer", "Thomas", "Linda", "Charles", "Elizabeth"]
     pin_last_names = ["Wilson", "Anderson", "Taylor", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia"]
-    
-    for i in range(1, 51):  # 50 PIN users
+    for i in range(1, 51):
         first_name = random.choice(pin_first_names)
         last_name = random.choice(pin_last_names)
         address = random.choice(addresses)
-        
         pin = UserEntity(
             username=f'pin_{first_name.lower()}{i}',
             password=generate_password_hash(f'pinpassword{i}'),
@@ -114,71 +143,59 @@ def seed_database():
             fullname=f'{first_name} {last_name}',
             email=f'{first_name.lower()}.{last_name.lower()}{i}@email.com',
             address=address,
-            phone=f'04{random.randint(10000000, 99999999)}',  # Australian mobile format
-            status='active' if i % 4 != 0 else 'pending',  # 75% approved, 25% pending
+            phone=f'04{random.randint(10000000, 99999999)}',
+            status='active' if i % 4 != 0 else 'pending',
             created_at=datetime.utcnow() - timedelta(days=random.randint(1, 90))
         )
         pin_users.append(pin)
         db.session.add(pin)
 
-    # Commit all changes
+    # Commit users & categories so we have IDs for FKs
+    db.session.commit()
+
     try:
-        db.session.commit()
-
-        # 6. PIN Requests (created by CSR Reps and assigned to CVs)
-        
-
+        # 6) PIN Requests
         pin_requests = []
         titles = [
-            "Food Donation Drive",
-            "Community Clean-Up",
-            "Health Awareness Event",
-            "Elderly Home Visit",
-            "Fundraising Campaign",
-            "Recycling Workshop",
-            "Beach Cleanup",
-            "Tree Planting Activity",
-            "Charity Walk",
-            "Blood Donation Support"
+            "Food Donation Drive", "Community Clean-Up", "Health Awareness Event",
+            "Elderly Home Visit", "Fundraising Campaign", "Recycling Workshop",
+            "Beach Cleanup", "Tree Planting Activity", "Charity Walk", "Blood Donation Support"
         ]
 
+        # Preload categories for assignment
+        categories = VCat.query.order_by(VCat.id.asc()).all()
+        category_ids = [c.id for c in categories] if categories else [None]
 
-
-        for i in range(1, 501):  # create 500 sample requests
+        for i in range(1, 501):
             csr_rep = random.choice(csr_reps)
             pin = random.choice(pin_users)
-            
-            # Use the consistent mapping to assign CV to this PIN
             assigned_cv_id = random.choice(corporate_volunteers).user_id
-            
-            # randomly decide if this request is in the past or future
-            if random.random() < 0.3:  # 30% chance to make it an expired one
+
+            # 30% in the past (not completed), else future or completed
+            if random.random() < 0.3:
                 start_date = datetime.utcnow() - timedelta(days=random.randint(3, 15))
                 end_date = start_date + timedelta(days=random.randint(1, 3))
-                status = random.choice(["pending", "active"])  # expired ones are not completed
+                status = random.choice(["pending", "active"])
             else:
                 start_date = datetime.utcnow() + timedelta(days=random.randint(1, 10))
                 end_date = start_date + timedelta(days=random.randint(1, 5))
                 status = random.choice(["pending", "active", "completed"])
-            
+
             title = f"{random.choice(titles)} #{i}"
 
-            # Generate completed_date ONLY if status is 'completed'
+            # completed_date only if completed, and always logical
             completed_date = None
             if status == "completed":
-                # Completion must be before today and after start_date
-                latest_possible = min(end_date, datetime.utcnow())  # can't exceed now
-                earliest_possible = start_date + timedelta(hours=1) # ensure logical sequence
+                now = datetime.utcnow()
+                latest_possible = min(end_date, now)
+                earliest_possible = min(start_date + timedelta(hours=1), latest_possible)
+                if earliest_possible < latest_possible:
+                    delta_seconds = int((latest_possible - earliest_possible).total_seconds())
+                    completed_date = earliest_possible + timedelta(seconds=random.randint(0, max(delta_seconds, 0)))
+                else:
+                    completed_date = latest_possible
 
-                # If end_date is already in the future, make sure completed_date ≤ now
-                if earliest_possible > latest_possible:
-                    earliest_possible = latest_possible - timedelta(hours=1)
-
-                # Randomly pick a date between earliest_possible and latest_possible
-                delta_seconds = int((latest_possible - earliest_possible).total_seconds())
-                completed_date = earliest_possible + timedelta(seconds=random.randint(0, delta_seconds))
-
-            request = PINRequestEntity(
+            req = PINRequestEntity(
                 requested_by_id=pin.user_id,
                 assigned_to_id=assigned_cv_id,
                 assigned_by_id=csr_rep.user_id,
@@ -191,25 +208,27 @@ def seed_database():
                 status=status,
                 service_type=random.choice(["cleanup", "elderly", "education", "food", "community", "environment", "health", "fundraising"]),
                 urgency=random.choice(["low", "medium", "high"]),
-                skills_required=random.choice(["Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"]),
+                skills_required=random.choice([
+                    "Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"
+                ]),
                 view_count=random.randint(0, 50),
-                shortlist_count=0
+                shortlist_count=0,
+                # Attach a category (PM can update later in dashboard)
+                volunteer_service_category_id=random.choice(category_ids)
             )
-            pin_requests.append(request)
-            db.session.add(request)
+            pin_requests.append(req)
+            db.session.add(req)
 
         db.session.commit()
 
         print("✅ Database seeded successfully!")
         print_stats()
-        
+
     except Exception as e:
         db.session.rollback()
         print(f"❌ Error seeding database: {e}")
 
-        
 def print_stats():
-    """Print statistics about the seeded data"""
     total_users = UserEntity.query.count()
     pm_count = UserEntity.query.filter_by(role='pm').count()
     admin_count = UserEntity.query.filter_by(role='admin').count()
@@ -218,7 +237,9 @@ def print_stats():
     pin_count = UserEntity.query.filter_by(role='pin').count()
     pending_count = UserEntity.query.filter_by(status='pending').count()
     active_count = UserEntity.query.filter_by(status='active').count()
-    
+    req_count = PINRequestEntity.query.count()
+    cat_count = VCat.query.count()
+
     print(f"\n📊 Database Statistics:")
     print(f"👥 Total Users: {total_users}")
     print(f"🏢 Platform Managers: {pm_count}")
@@ -226,37 +247,31 @@ def print_stats():
     print(f"💼 CSR Representatives: {csrrep_count}")
     print(f"🤝 Corporate Volunteers: {cv_count}")
     print(f"🙋 Persons in Need: {pin_count}")
+    print(f"📦 Requests: {req_count}")
+    print(f"🏷️ Service Categories: {cat_count}")
     print(f"⏳ Pending Approvals: {pending_count}")
     print(f"✅ Active Users: {active_count}")
 
 def get_sample_login_credentials():
-    """Get sample login credentials for testing"""
     print(f"\n🔐 Sample Login Credentials:")
-    
-    # Platform Manager
     pm = UserEntity.query.filter_by(role='pm').first()
-    print(f"Platform Manager: username='{pm.username}', password='pm001'")
-    
-    # Admin
+    if pm:
+        print(f"Platform Manager: username='{pm.username}', password='pm001'")
     admin = UserEntity.query.filter_by(role='admin').first()
-    print(f"Admin: username='{admin.username}', password='admin123'")
-    
-    # CSR Rep
+    if admin:
+        print(f"Admin: username='{admin.username}', password='admin123'")
     csr_rep = UserEntity.query.filter_by(role='csrrep').first()
-    print(f"CSR Rep: username='{csr_rep.username}', password='csrrep1'")
-    
-    # Corporate Volunteer
+    if csr_rep:
+        print(f"CSR Rep: username='{csr_rep.username}', password='csrrep1'")
     cv = UserEntity.query.filter_by(role='cv', status='active').first()
-    print(f"Corporate Volunteer: username='{cv.username}', password='cvpassword1'")
-    
-    # PIN
+    if cv:
+        print(f"Corporate Volunteer: username='{cv.username}', password='cvpassword1'")
     pin = UserEntity.query.filter_by(role='pin', status='active').first()
-    print(f"PIN: username='{pin.username}', password='pinpassword1'")
+    if pin:
+        print(f"PIN: username='{pin.username}', password='pinpassword1'")
 
 if __name__ == "__main__":
-    # Import your app to get the database context
     from app import app
-    
     with app.app_context():
         seed_database()
         get_sample_login_credentials()

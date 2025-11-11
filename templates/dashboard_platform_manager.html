@@ -1,35 +1,258 @@
 {% extends 'base.html' %}
 
-{% block head %}
-<title>Platform Manager Dashboard</title>
-{% endblock %}
-
 {% block body %}
-<div class="dashboard">
-    <h1>Platform Manager Dashboard</h1>
-    <div class="header-options">
-        <a href="{{ url_for('register_admin') }}" class="header-options">Create Admin Account</a>
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
-    </div>
-</div>
-<div>
-    <h2>Total Users: {{ total_users }}</h2>
-    <table class="my-table">
-        <tr>
-            <th>User ID</th>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Location</th>
+<div class="container py-5">
+  <div class="dashboard-wrap mx-auto">
 
-        </tr>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.user_id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.address }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="mb-0 fw-bold text-dark">Platform Manager Dashboard</h2>
+      <div class="d-none d-md-flex gap-2">
+        <a class="btn btn-outline-dark" href="{{ url_for('dashboard_platform_manager') }}">Categories</a>
+        <a class="btn btn-success" href="{{ url_for('view_report', autogen='1') }}">Open Reports</a>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mt-2">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} mb-2">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Quick Actions (cards) -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <div class="qa-card h-100">
+          <div class="qa-icon">🗂️</div>
+          <div class="qa-content">
+            <h5 class="mb-1">Manage Service Categories</h5>
+            <p class="mb-3 text-muted">Create, edit, activate/deactivate categories and see linked request counts.</p>
+            <a href="{{ url_for('dashboard_platform_manager') }}" class="btn btn-primary">Open Categories</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="qa-card h-100">
+          <div class="qa-icon">📈</div>
+          <div class="qa-content">
+            <h5 class="mb-1">Generate Activity Reports</h5>
+            <p class="mb-3 text-muted">Daily / weekly / monthly trends for users, requests, matches — with CSV export.</p>
+            <a href="{{ url_for('view_report', autogen='1') }}" class="btn btn-outline-dark">Open Reports</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      :root {
+        --pm-bg: #eaf3f6;
+        --pm-surface: #ffffff;
+        --pm-border: #b2dfdb;
+        --pm-accent: #009688;
+        --pm-accent-dark: #00796b;
+        --pm-text-muted: #6b7280;
+      }
+      body { background: var(--pm-bg); }
+      .dashboard-wrap { max-width: 1100px; }
+
+      /* Quick action cards */
+      .qa-card {
+        display: flex; gap: 16px; align-items: flex-start;
+        background: #fff; border: 1px solid #e6e8eb;
+        border-radius: 14px; padding: 16px 18px;
+        box-shadow: 0 8px 24px rgba(16,24,40,.06);
+      }
+      .qa-icon { font-size: 1.8rem; line-height: 1; }
+      .qa-content p { font-size: .95rem; }
+
+      /* Card shells */
+      .pm-card {
+        background: var(--pm-surface);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(16,24,40,.08);
+        border: 1px solid var(--pm-border);
+      }
+
+      /* ---------- ADD CATEGORY ---------- */
+      .pm-add-header {
+        background: linear-gradient(180deg, #6fd3cc, #4db6ac);
+        color: #073b3a;
+        font-weight: 800;
+        padding: 14px 16px;
+        border-radius: 12px 12px 0 0;
+        letter-spacing: .02em;
+      }
+      .pm-form-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1.7fr 0.6fr 0.4fr;
+        gap: 18px;
+        align-items: center;
+        padding: 18px 12px;
+      }
+      @media (max-width: 992px) { .pm-form-grid { grid-template-columns: 1fr; } }
+
+      .pm-field label {
+        display: block; font-weight: 600; margin-bottom: 6px; color: #0b3d3b;
+      }
+      .pm-input-lg.form-control {
+        border: 1.5px solid #cfe8e6; border-radius: 14px;
+        font-size: 1rem; padding: 12px 14px; background: #fcfefe; color: #10393a;
+        transition: all .2s ease;
+      }
+      .pm-input-lg::placeholder { color: #99a7ad; }
+      .pm-input-lg:focus {
+        border-color: var(--pm-accent);
+        box-shadow: 0 0 0 .25rem rgba(0,150,136,.18);
+        background: #fff; outline: none;
+      }
+      .form-check.form-switch .form-check-input {
+        width: 2.6rem; height: 1.3rem; cursor: pointer; margin-top: 0;
+      }
+      .pm-btn { border-radius: 12px; padding: 10px 18px; font-weight: 700; transition: all .15s ease; }
+      .pm-btn-add { background: var(--pm-accent); color: #fff; border: none; width: 100%; }
+      .pm-btn-add:hover { background: var(--pm-accent-dark); }
+
+      /* ---------- TABLE ---------- */
+      .pm-table-wrap {
+        border: 2px solid var(--pm-accent);
+        border-radius: 18px;
+        overflow: hidden;
+        background: var(--pm-surface);
+        box-shadow: 0 8px 24px rgba(16,24,40,.08);
+        margin: 0 auto; /* center wrapper */
+      }
+      table.pm-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+      .pm-table thead th {
+        background: linear-gradient(180deg, #26a69a, #009688);
+        color: #fff; text-transform: uppercase; font-weight: 800; letter-spacing: .05em;
+        font-size: .9rem; padding: 14px 12px; text-align: center;
+      }
+      .pm-table tbody td {
+        background: #fff; border-top: 1px solid #e0f2f1;
+        padding: 12px 12px; vertical-align: middle;
+      }
+      .pm-table tbody tr:hover td { background: #f1f9f8; }
+
+      /* Col widths for readability; will wrap on small screens */
+      .pm-table .col-name   { width: 24%; min-width: 220px; }
+      .pm-table .col-desc   { width: 44%; }
+      .pm-table .col-active { width: 10%; text-align: center; }
+      .pm-table .col-linked { width: 16%; min-width: 220px; }
+      .pm-table .col-actions{ width: 6%; text-align: right; white-space: nowrap; }
+
+      .pm-input.form-control {
+        border: 1px solid #cfdfe0; border-radius: 12px; font-size: .95rem; background: #fcfcfc;
+      }
+      .pm-input:focus { border-color: var(--pm-accent); box-shadow: 0 0 0 .2rem rgba(0,150,136,.18); }
+      .pm-textarea { min-height: 48px; max-height: 120px; resize: vertical; }
+
+      .pm-chips { display: flex; flex-wrap: wrap; gap: .35rem .45rem; }
+      .pm-chip {
+        background: #e0f2f1; border: 1px solid #80cbc4; color: #004d40;
+        border-radius: 999px; padding: .28rem .6rem; font-size: .8rem; font-weight: 700;
+      }
+
+      .pm-btn-sm { border-radius: 10px; padding: .38rem .7rem; font-weight: 700; }
+      .pm-btn-save { background: var(--pm-accent); color:#fff; border:none; }
+      .pm-btn-save:hover { background: var(--pm-accent-dark); }
+      .pm-btn-del { border: 1px solid #ef4444; color:#ef4444; background:#fff; }
+      .pm-btn-del:hover { background:#fef2f2; }
+    </style>
+
+    <!-- ========== ADD CATEGORY CARD ========== -->
+    <div class="pm-card mb-4">
+      <div class="pm-add-header">Add a Service Category</div>
+      <form method="post" action="{{ url_for('route_pm_category_create') }}">
+        <div class="pm-form-grid">
+          <div class="pm-field">
+            <label>Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="pm-input-lg form-control" placeholder="e.g., Community Clean-Up" required>
+          </div>
+          <div class="pm-field">
+            <label>Description</label>
+            <input type="text" name="description" class="pm-input-lg form-control" placeholder="Short description (optional)">
+          </div>
+          <div class="pm-field align-self-center text-center">
+            <div class="form-check form-switch d-flex align-items-center justify-content-center gap-2">
+              <input class="form-check-input" type="checkbox" name="is_active" id="is_active_add" checked>
+              <label class="form-check-label fw-semibold" for="is_active_add">Active</label>
+            </div>
+          </div>
+          <div class="pm-field align-self-center text-end">
+            <button type="submit" class="pm-btn pm-btn-add">Add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ========== CATEGORIES TABLE ========== -->
+    <div class="pm-table-wrap">
+      <div class="table-responsive">
+        <table class="pm-table">
+          <thead>
+            <tr>
+              <th class="col-name">Name</th>
+              <th class="col-desc">Description</th>
+              <th class="col-active">Active</th>
+              <th class="col-linked">Linked Requests</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            {% set c = (counts|default({})).get(cat.id, {}) %}
+            <tr>
+              <form method="post" action="{{ url_for('route_pm_category_update', cat_id=cat.id) }}">
+                <td class="col-name">
+                  <input type="text" name="name" class="form-control pm-input" value="{{ cat.name }}" required>
+                </td>
+                <td class="col-desc">
+                  <textarea name="description" class="form-control pm-input pm-textarea" rows="2" placeholder="Enter description...">{{ cat.description or '' }}</textarea>
+                </td>
+                <td class="col-active">
+                  <div class="form-check form-switch d-inline-block">
+                    <input class="form-check-input" type="checkbox" name="is_active" {% if cat.is_active %}checked{% endif %}>
+                  </div>
+                </td>
+                <td class="col-linked">
+                  <div class="pm-chips">
+                    <span class="pm-chip">total {{ c.get('total', 0) }}</span>
+                    <span class="pm-chip">pending {{ c.get('pending', 0) }}</span>
+                    <span class="pm-chip">active {{ c.get('active', 0) }}</span>
+                    <span class="pm-chip">late {{ c.get('late', 0) }}</span>
+                    <span class="pm-chip">completed {{ c.get('completed', 0) }}</span>
+                  </div>
+                </td>
+                <td class="col-actions">
+                  <div class="d-flex justify-content-end gap-2">
+                    <button class="pm-btn-sm pm-btn-save" type="submit">Save</button>
+                  </div>
+              </form>
+              <form method="post"
+                    action="{{ url_for('route_pm_category_delete', cat_id=cat.id) }}"
+                    class="d-inline"
+                    onsubmit="return confirm('Delete category {{ cat.name }}? This cannot be undone.');">
+                    <button class="pm-btn-sm pm-btn-del" type="submit">Delete</button>
+              </form>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile footer buttons for quick nav -->
+    <div class="d-md-none d-flex gap-2 justify-content-stretch mt-4">
+      <a class="btn btn-outline-dark w-50" href="{{ url_for('dashboard_platform_manager') }}">Categories</a>
+      <a class="btn btn-success w-50" href="{{ url_for('view_report', autogen='1') }}">Reports</a>
+    </div>
+
+  </div>
 </div>
 {% endblock %}

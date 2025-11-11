@@ -35,6 +35,14 @@ class PINRequestEntity(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     cancelled_at = db.Column(db.DateTime, nullable=True)
 
+    volunteer_service_category_id = db.Column(
+        db.Integer,
+        db.ForeignKey('volunteer_service_categories.id'),
+        nullable=True
+    )
+    # Optional: relationship for easy access
+    volunteer_service_category = db.relationship('VolunteerServiceCategoryEntity', backref='pin_requests', lazy=True)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

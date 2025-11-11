@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="container py-5">
+
+  <style>
+    :root {
+      --pm-accent: #009688;
+      --pm-accent-2: #34c6b3;
+      --pm-accent-dark: #00796b;
+      --pm-bg: #f6fafb;
+      --pm-surface: #ffffff;
+      --pm-text: #062e2d;
+      --pm-muted: #6b7a78;
+      --pm-border: #d7ecea;
+      --ring: 0 0 0 .24rem rgba(0,150,136,.15);
+      --radius: 16px;
+    }
+
+    body { background: var(--pm-bg); color: var(--pm-text); }
+
+    /* ---------- Generic Cards ---------- */
+    .pm-card {
+      background: var(--pm-surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--pm-border);
+      box-shadow: 0 10px 28px rgba(16,24,40,.06);
+      overflow: hidden;
+      transition: transform .18s ease;
+    }
+    .pm-card:hover { transform: translateY(-2px); }
+
+    .pm-header {
+      background: linear-gradient(90deg, var(--pm-accent-2), var(--pm-accent));
+      color: #fff; font-weight: 750;
+      padding: 14px 18px; font-size: 1.03rem;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+
+    .btn-accent {
+      background: var(--pm-accent); color:#fff; border:none;
+      border-radius: 10px; font-weight: 700; padding: 10px 18px;
+      transition: background .15s ease, transform .15s ease;
+    }
+    .btn-accent:hover { background: var(--pm-accent-dark); transform: translateY(-1px); }
+
+    .btn-ghost {
+      border: 1px solid var(--pm-accent);
+      color: var(--pm-accent-dark); background: #fff;
+      border-radius: 10px; font-weight: 700; padding: 10px 14px;
+    }
+    .btn-ghost:hover { background: #ebfffc; }
+
+    /* ---------- New Header / Subnav ---------- */
+    .subnav {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; margin-bottom: 18px;
+    }
+    .page-title { font-weight: 800; letter-spacing:.2px; margin:0; }
+
+    .segmented {
+      display:flex; gap:8px; background:#eaf6f5; padding:6px;
+      border-radius: 999px; border:1px solid #cfe8e6;
+    }
+    .segmented a {
+      display:flex; align-items:center; gap:8px;
+      padding:8px 14px; border-radius:999px; text-decoration:none;
+      color:#0d4a47; font-weight:700; white-space:nowrap;
+    }
+    .segmented a.active {
+      background:#fff; color: var(--pm-accent-dark);
+      box-shadow: var(--ring);
+    }
+
+    /* ---------- Generate Block ---------- */
+    .controls-grid {
+      display:grid; gap:14px;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
+    }
+    @media (max-width: 992px) {
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+    .form-label { font-weight:700; color:#0c3f3d; font-size:.9rem; }
+    .form-control, .form-select {
+      border-radius: 12px !important;
+      border: 1.5px solid #cfe8e6 !important;
+      background:#fcfffe; box-shadow:none;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--pm-accent) !important; box-shadow: var(--ring) !important;
+    }
+
+    /* ---------- KPI Grid ---------- */
+    .kpi-grid {
+      display:grid; gap:16px; padding:18px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .kpi {
+      background:#f9fffe; border:1px solid #e0f2f1; border-radius: 14px;
+      text-align:center; padding:18px;
+    }
+    .kpi .num { font-size: 2rem; font-weight:800; color: var(--pm-accent-dark); }
+    .kpi .lbl { color: var(--pm-muted); font-weight: 600; }
+
+    .chips { padding: 10px 14px; }
+    .chip {
+      display:inline-flex; align-items:center; gap:6px;
+      background:#e0f2f1; border:1px solid #80cbc4; color:#004d40;
+      border-radius:999px; padding:.38rem .75rem; font-weight:700; font-size:.85rem;
+      margin-right:8px; margin-bottom:8px;
+    }
+
+    /* ---------- Time-Series (Modern) ---------- */
+    .series-wrap { padding: 16px; }
+    .series-table {
+      --row-pad: 12px;
+      width:100%; border-collapse: separate; border-spacing:0;
+      border:1px solid var(--pm-border); border-radius: 12px; overflow:hidden;
+    }
+    .series-table thead th {
+      background: linear-gradient(180deg, #26a69a, var(--pm-accent));
+      color:#fff; text-transform:uppercase; letter-spacing:.05em;
+      font-size:.85rem; padding: var(--row-pad);
+    }
+    .series-table tbody td {
+      background:#fff; border-top:1px solid #e6f3f2;
+      padding: var(--row-pad); vertical-align: middle;
+    }
+    .series-table tbody tr:hover td { background:#f3fbfa; }
+
+    /* Inline “bar chart” using CSS only */
+    .bar {
+      --p: 0%;
+      position: relative;
+      background: #f0fbfa;
+      border: 1px solid #d6efed;
+      border-radius: 10px;
+      height: 32px; overflow:hidden;
+    }
+    .bar::before{
+      content:"";
+      position:absolute; inset:0;
+      width: var(--p);
+      background: linear-gradient(90deg, var(--pm-accent-2), var(--pm-accent));
+    }
+    .bar .val {
+      position: absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-weight:800; color:#063c3a;
+      mix-blend-mode: multiply;
+    }
+
+    /* Sticky helper row for actions below table (mobile friendly) */
+    .series-actions {
+      display:flex; gap:10px; justify-content:flex-end; padding:12px 0 0 0;
+      flex-wrap: wrap;
+    }
+  </style>
+
+  <!-- ===== Header / Subnav (App-like tabs) ===== -->
+  <div class="subnav">
+    <h3 class="page-title mb-0">Activity Reports</h3>
+    <div class="segmented">
+      <a href="{{ url_for('dashboard_platform_manager') }}">🗂️ <span>Categories</span></a>
+      <a class="active" href="{{ url_for('view_report') }}?autogen=1">📊 <span>Reports</span></a>
+    </div>
+  </div>
+
+  <!-- ===== Generate Section ===== -->
+  <div class="pm-card mb-4">
+    <div class="pm-header">
+      <span>Generate Activity Report</span>
+      <span class="text-white-50 small">Choose period & export CSV</span>
+    </div>
+    <div class="p-3">
+      <div class="controls-grid">
+        <form class="d-contents" method="post" action="{{ url_for('view_report') }}">
+          <div>
+            <label class="form-label">Granularity</label>
+            <select class="form-select" name="granularity">
+              <option value="daily"   {{ 'selected' if granularity=='daily' else '' }}>Daily</option>
+              <option value="weekly"  {{ 'selected' if granularity=='weekly' else '' }}>Weekly</option>
+              <option value="monthly" {{ 'selected' if granularity=='monthly' else '' }}>Monthly</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Start</label>
+            <input type="datetime-local" name="start" class="form-control"
+                   value="{{ period_start.strftime('%Y-%m-%dT%H:%M') if period_start else '' }}">
+          </div>
+          <div>
+            <label class="form-label">End</label>
+            <input type="datetime-local" name="end" class="form-control"
+                   value="{{ period_end.strftime('%Y-%m-%dT%H:%M') if period_end else '' }}">
+          </div>
+          <div class="d-flex gap-2 align-self-end">
+            <button class="btn-accent" type="submit">Generate</button>
+          </div>
+        </form>
+
+        {% if payload %}
+        <form class="d-flex gap-2 align-self-end justify-content-end" method="post" action="{{ url_for('export_report') }}">
+          <input type="hidden" name="granularity" value="{{ granularity }}">
+          <input type="hidden" name="start" value="{{ period_start.isoformat() }}">
+          <input type="hidden" name="end" value="{{ period_end.isoformat() }}">
+          <button class="btn-ghost" type="submit">Export CSV</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if payload %}
+  {# Precompute maxes for inline bars #}
+  {% set max_users    = (payload.timeseries.new_users|max) if payload.timeseries.new_users else 1 %}
+  {% set max_requests = (payload.timeseries.new_requests|max) if payload.timeseries.new_requests else 1 %}
+  {% set max_matches  = (payload.timeseries.matches|max) if payload.timeseries.matches else 1 %}
+
+  <!-- ===== KPIs ===== -->
+  <div class="pm-card mb-4">
+    <div class="pm-header">Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="num">{{ payload.kpis.total_users }}</div><div class="lbl">Total Users</div></div>
+      <div class="kpi"><div class="num">{{ payload.kpis.new_users }}</div><div class="lbl">New Users</div></div>
+      <div class="kpi"><div class="num">{{ payload.kpis.new_requests }}</div><div class="lbl">New Requests</div></div>
+      <div class="kpi"><div class="num">{{ payload.kpis.matches }}</div><div class="lbl">Matches</div></div>
+    </div>
+    <div class="chips">
+      <span class="chip">Conversion {{ payload.kpis.request_to_match_conversion_pct }}%</span>
+      <span class="chip">Period {{ payload.kpis.period_start.split('T')[0] }} → {{ payload.kpis.period_end.split('T')[0] }}</span>
+      <span class="chip">Granularity {{ payload.kpis.granularity|title }}</span>
+    </div>
+  </div>
+
+  <!-- ===== Time Series (with inline bars) ===== -->
+  <div class="pm-card mb-5">
+    <div class="pm-header">Time Series</div>
+    <div class="series-wrap">
+      <div class="table-responsive">
+        <table class="series-table">
+          <thead>
+            <tr>
+              <th>Bucket</th>
+              <th style="min-width:220px">New Users</th>
+              <th style="min-width:220px">New Requests</th>
+              <th style="min-width:220px">Matches</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in payload.timeseries.buckets %}
+              {% set i = loop.index0 %}
+              {% set v_users    = payload.timeseries.new_users[i] %}
+              {% set v_requests = payload.timeseries.new_requests[i] %}
+              {% set v_matches  = payload.timeseries.matches[i] %}
+              {% set p_users    = (100 * v_users    / (1 if max_users==0    else max_users))    | round(0, 'floor') %}
+              {% set p_requests = (100 * v_requests / (1 if max_requests==0 else max_requests)) | round(0, 'floor') %}
+              {% set p_matches  = (100 * v_matches  / (1 if max_matches==0  else max_matches))  | round(0, 'floor') %}
+              <tr>
+                <td class="fw-semibold">{{ b }}</td>
+                <td>
+                  <div class="bar" style="--p: {{ p_users }}%;">
+                    <div class="val">{{ v_users }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="bar" style="--p: {{ p_requests }}%;">
+                    <div class="val">{{ v_requests }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="bar" style="--p: {{ p_matches }}%;">
+                    <div class="val">{{ v_matches }}</div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="series-actions">
+        <form method="post" action="{{ url_for('export_report') }}">
+          <input type="hidden" name="granularity" value="{{ granularity }}">
+          <input type="hidden" name="start" value="{{ period_start.isoformat() }}">
+          <input type="hidden" name="end" value="{{ period_end.isoformat() }}">
+          <button class="btn-ghost" type="submit">Export CSV</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="pm-card">
+    <div class="pm-header">Report Preview</div>
+    <div class="p-4">
+      <p class="mb-2 text-muted">Select a range and click <strong>Generate</strong> to view insights.</p>
+      <ul class="mb-0 small text-muted">
+        <li>Daily → Last 7 days</li>
+        <li>Weekly → Last 8 weeks</li>
+        <li>Monthly → Last 6 months</li>
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
