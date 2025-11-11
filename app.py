@@ -16,7 +16,7 @@ try:
     from boundaries.platform_manager_boundary import display_dashboard_platform_manager
 except Exception:
     try:
-        from boundaries.platform_manager_page import display_dashboard_platform_manager
+        from boundaries.platform_manager_boundary import display_dashboard_platform_manager
     except Exception:
         def display_dashboard_platform_manager():
             flash("Platform Manager page missing. Please ensure boundary file exists.", "warning")
@@ -160,7 +160,7 @@ def _build_report_payload(period_start: datetime, period_end: datetime, granular
 # -----------------------------
 @app.route("/", methods=["POST", "GET"])
 def homepage():
-    return display_login_page()
+    return display_homepage()
 
 @app.route("/csr_mission")
 def csr_mission():
