@@ -36,6 +36,8 @@ from controllers.RequestController import RequestController
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
 from entities.FeedbackEntity import FeedbackEntity
+from entities.InterestEntity import InterestEntity
+from entities.RequestViewEntity import RequestViewEntity
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -290,6 +292,39 @@ def reject_request(request_id):
 def complete_request(request_id):
     RequestController.complete_request(request_id)
     return redirect(url_for('dashboard_cv'))
+
+@app.route('/dashboard_cv/interest/<string:request_id>', methods=['POST'])
+def express_interest(request_id):
+    cv = UserEntity.query.filter_by(username=session['username'], role='cv').first()
+
+    
+    #req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+
+    # ✅ Debug print BEFORE calling RequestController (DELETE)
+    interested = InterestEntity.query.filter_by(request_id=request_id).all()
+    print("BEFORE interested for", request_id, ":", [i.cv_id for i in interested])
+
+
+    RequestController.express_interest(request_id, cv.user_id)
+    
+
+    # DELETE
+    print("Express interest triggered!")
+    print("Request ID:", request_id)
+    print("CV ID:", cv.user_id)
+
+    print("AFTER interested for", request_id, ":", [i.cv_id for i in interested]) #DELETE
+
+    return redirect(url_for('dashboard_cv'))
+
+@app.route("/view_request/<string:request_id>")
+def view_request(request_id):
+    cv = UserEntity.query.filter_by(username=session['username'], role='cv').first()
+    RequestController.record_view(request_id, cv.user_id)
+
+    # Redirect back to dashboard and open modal
+    return redirect(url_for('dashboard_cv', open=request_id))
+
 
 @app.route('/cv_account_info')
 def cv_account_info():

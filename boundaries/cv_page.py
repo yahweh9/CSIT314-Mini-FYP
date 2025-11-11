@@ -20,8 +20,10 @@ def display_dashboard_cv():
                                                                   status=status, 
                                                                   urgency=urgency, 
                                                                   sort=sort)
+    
+    unassigned_requests = RequestController.get_unassigned_requests()
 
-    return render_template('dashboard_cv.html', user=cv, requests=assigned_requests)
+    return render_template('dashboard_cv.html', user=cv, requests=assigned_requests, unassigned_req=unassigned_requests)
 
 def display_history_cv():
     if 'username' not in session:

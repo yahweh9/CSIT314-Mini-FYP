@@ -2,6 +2,7 @@
 from .UserEntity import db
 from datetime import datetime
 
+
 class PINRequestEntity(db.Model):
     __tablename__ = 'pin_requests'
 
@@ -12,7 +13,8 @@ class PINRequestEntity(db.Model):
     end_date = db.Column(db.DateTime, nullable=False)
     completed_date = db.Column(db.DateTime) # Date that CV completed the request
     description = db.Column(db.Text)
-    
+    interests = db.relationship('InterestEntity', backref='request', lazy=True) # Linked to InterestEntity
+
     # Service details - MAKE SURE THESE EXIST
     service_type = db.Column(db.String(50))
     location = db.Column(db.String(100))
@@ -35,6 +37,7 @@ class PINRequestEntity(db.Model):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
         last_request = PINRequestEntity.query.order_by(PINRequestEntity.request_id.desc()).first()
         if last_request:
             num = int(last_request.request_id[1:]) + 1
@@ -68,3 +71,17 @@ class PINRequestEntity(db.Model):
         if direction == "asc":
             return query.order_by(PINRequestEntity.end_date.asc())
         return query.order_by(PINRequestEntity.end_date.desc())
+    
+    @classmethod
+    def get_unassigned(cls):
+        return cls.query.filter_by(assigned_to_id=None).all()
+    
+    @classmethod
+    def unassign(cls, request_id):
+        req = cls.query.filter_by(request_id=request_id).first()
+        if not req:
+            return None
+        
+        req.assigned_to_id = None
+        return req
+
