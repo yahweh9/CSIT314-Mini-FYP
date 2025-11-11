@@ -193,7 +193,7 @@ def seed_database():
                 urgency=random.choice(["low", "medium", "high"]),
                 skills_required=random.choice(["Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"]),
                 view_count=random.randint(0, 50),
-                shortlist_count=random.randint(0, 10)
+                shortlist_count=0
             )
             pin_requests.append(request)
             db.session.add(request)
