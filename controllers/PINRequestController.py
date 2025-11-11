@@ -194,4 +194,6 @@ class PINRequestController:
             flash("Error cancelling request. Please try again.", "error")
             return False
     
-
+    @staticmethod
+    def get_unassigned_requests():
+        return PINRequestEntity.get_unassigned()

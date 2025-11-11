@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import random
 from entities.UserEntity import db, UserEntity
+from entities.PINRequestEntity import PINRequestEntity
 
 def seed_database():
     """Seed the database with initial test data"""
@@ -125,7 +126,7 @@ def seed_database():
         db.session.commit()
 
         # 6. PIN Requests (created by CSR Reps and assigned to CVs)
-        from entities.PINRequestEntity import PINRequestEntity
+        
 
         pin_requests = []
         titles = [
@@ -141,19 +142,14 @@ def seed_database():
             "Blood Donation Support"
         ]
 
-        # Create a mapping of PIN users to CV users for consistent assignment
-        pin_cv_mapping = {}
-        for i, pin in enumerate(pin_users):
-            # Assign each PIN to a specific CV (round-robin assignment)
-            cv_index = i % len(corporate_volunteers)
-            pin_cv_mapping[pin.user_id] = corporate_volunteers[cv_index].user_id
 
-        for i in range(1, 251):  # create 250 sample requests
+
+        for i in range(1, 501):  # create 500 sample requests
             csr_rep = random.choice(csr_reps)
             pin = random.choice(pin_users)
             
             # Use the consistent mapping to assign CV to this PIN
-            assigned_cv_id = pin_cv_mapping[pin.user_id]
+            assigned_cv_id = random.choice(corporate_volunteers).user_id
             
             # randomly decide if this request is in the past or future
             if random.random() < 0.3:  # 30% chance to make it an expired one
@@ -197,7 +193,7 @@ def seed_database():
                 urgency=random.choice(["low", "medium", "high"]),
                 skills_required=random.choice(["Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"]),
                 view_count=random.randint(0, 50),
-                shortlist_count=random.randint(0, 10)
+                shortlist_count=0
             )
             pin_requests.append(request)
             db.session.add(request)

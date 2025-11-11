@@ -16,6 +16,15 @@
         <a class=nav-bar-options href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
 </div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mt-3">
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+  {% endif %}
+{% endwith %}
 <div class="welcome-message">
     <h3>Welcome, {{ user.fullname }}. View your assigned request(s) below.</h3>
 </div>
@@ -131,9 +140,102 @@
         </div>
         {% endfor %}
 
+        {% else %}
+        <p class="no-requests-message">No requests found. If you have filters applied, try resetting them or applying a different one.</p>
+        {% endif %}
+    </table>
 
+    <h2>Unassigned Requests</h2>
+
+    {% if unassigned_req %}
+    <table class="my-table">
+        <tr>
+            <th>Request ID</th>
+            <th>Title</th>
+            <th>Service Category</th>
+            <th>PIN Name</th>
+            <th>Status</th>
+            <th>Urgency</th>
+            <th>Deadline</th>
+            <th>View Details</th>
+        </tr>
+        
+        {% for u_req in unassigned_req %}
+        <tr>
+            <td>{{ u_req.request_id }}</td>
+            <td>{{ u_req.title }}</td>
+            <td class="cv-service-type">{{ u_req.service_type }}</td>
+            <td>{{ u_req.pin_name }}</td>
+            <td>
+                <span class="status-badge {{ u_req.status|lower }}">
+                    {{ u_req.status }}
+                </span>
+            </td>
+            <td>
+                <span class="urgency-badge {{ u_req.urgency|lower }}">
+                    {{ u_req.urgency }}
+                </span>
+            </td>
+            <td>{{ u_req.end_date.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>
+                <a class="btn btn-primary"
+                href="{{ url_for('view_request', request_id=u_req.request_id) }}">
+                    Details
+                </a>
+
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- Modals -->
+        {% for u_req in unassigned_req %}
+        
+        <div class="modal fade" id="requestModal{{ u_req.request_id }}" tabindex="-1" aria-labelledby="modalLabel{{ u_req.request_id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content p-3" style="border-radius: 15px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel{{ u_req.request_id }}">{{ u_req.title }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>ID:</strong> {{ u_req.request_id }}</p>
+                        <p><strong>Requested By:</strong> {{ u_req.pin_name }}</p>
+                        <p><strong>Location:</strong> {{ u_req.location }}</p>
+                        <p><strong>Status:</strong>
+                        <span class="status-badge {{ u_req.status|lower }}">{{ u_req.status }}</span>
+                        </p>
+                        <p><strong>Description:</strong> {{ u_req.description }}</p>
+                        <p><strong>Start Date:</strong> {{ u_req.start_date.strftime('%d/%m/%Y %H:%M') }}</p>
+                        <p><strong>End Date:</strong> {{ u_req.end_date.strftime('%d/%m/%Y %H:%M') }}</p>
+                        <p><strong>Created On:</strong> {{ u_req.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    </div>
+                    <!-- Action buttons -->
+                    <div class="modal-footer">
+                        
+                        <form action="{{ url_for('express_interest', request_id=u_req.request_id) }}" method="post">
+                            <button type="submit" class="btn btn-success">Express Interest</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     {% else %}
-    <p class="no-requests-message">No requests found. If you have filters applied, try resetting them or applying a different one.</p>
+    <p class="no-requests-message">No unassigned requests found.</p>
     {% endif %}
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const reqId = "{{ request.args.get('open') }}";
+    if (reqId) {
+        const modalElement = document.getElementById("requestModal" + reqId);
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }
+});
+</script>
+
 {% endblock %}

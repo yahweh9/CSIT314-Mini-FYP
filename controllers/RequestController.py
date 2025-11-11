@@ -10,6 +10,7 @@ from sqlalchemy import func
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
 from entities.FeedbackEntity import FeedbackEntity
+from entities.InterestEntity import InterestEntity
 
 class RequestController:
     
@@ -116,17 +117,20 @@ class RequestController:
     @staticmethod
     def reject_request(request_id):
         try:
-            req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+            # call the entity method
+            req = PINRequestEntity.unassign(request_id)
+
             if req and req.status == 'pending':
-                db.session.delete(req)
                 db.session.commit()
                 return True
+
             return False
-        
+
         except Exception as e:
             db.session.rollback()
             print("Error:", e)
             return False
+
         
     @staticmethod
     def complete_request(request_id):
@@ -143,6 +147,36 @@ class RequestController:
             db.session.rollback()
             print("Error:", e)
             return False
+        
+    @staticmethod
+    def express_interest(request_id, cv_id):
+        try:
+            # check if interest already exists
+            existing = InterestEntity.query.filter_by(request_id=request_id, cv_id=cv_id).first()
+            if existing:
+                flash("You already expressed interest.", "warning")
+                print("ALREADY EXPRESSED") #DELETE
+                return False
+
+            new_interest = InterestEntity(request_id=request_id, cv_id=cv_id)
+            db.session.add(new_interest)
+
+            # Update shortlist_count
+            req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+            req.shortlist_count = InterestEntity.query.filter_by(request_id=request_id).count()
+
+            db.session.commit()
+
+            print("SUCCESS") #DELETE
+            flash("You have expressed your interest!", "success")
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            flash("Something went wrong.", "danger")
+            print("Error:", e)
+            return False
+
 
     @staticmethod
     def normalize_skills(value):
@@ -207,8 +241,38 @@ class RequestController:
     def notify_parties(match: MatchEntity):
         print(f"[Notify] Match #{match.match_id} created for PIN {match.pin_request_id} and User {match.user_id}")
 
+    @staticmethod
+    def get_unassigned_requests():
+        unassigned_requests = PINRequestEntity.get_unassigned()
+        # Attach PIN name (boundary convenience data)
+        for req in unassigned_requests:
+            pin_user = UserEntity.query.get(req.requested_by_id)
+            req.pin_name = pin_user.fullname if pin_user else "Unknown"
+        return unassigned_requests
 
+    @staticmethod
+    def record_view(request_id, cv_id):
+        # Check if this CV already viewed it
+        from entities.RequestViewEntity import RequestViewEntity
 
+        existing = RequestViewEntity.query.filter_by(
+            request_id=request_id,
+            cv_id=cv_id
+        ).first()
+
+        if existing:
+            return False  # Already counted
+
+        # Add new view record
+        new_view = RequestViewEntity(request_id=request_id, cv_id=cv_id)
+        db.session.add(new_view)
+
+        # Increment view count
+        req = PINRequestEntity.query.filter_by(request_id=request_id).first()
+        req.view_count += 1
+
+        db.session.commit()
+        return True
 
 
 
