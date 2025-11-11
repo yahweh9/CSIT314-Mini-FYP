@@ -121,4 +121,77 @@ class PINRequestController:
             return True
         return False
     
+    @staticmethod
+    def update_request(request_id, form_data, pin_id=None):
+        """Update an existing request with new details"""
+        request_obj = PINRequestEntity.query.filter_by(request_id=request_id).first()
+
+        # Ownership check
+        if not request_obj or (pin_id and request_obj.requested_by_id != pin_id):
+            flash("Unauthorized or request not found", "error")
+            return False
+
+        # Validate required fields
+        title = form_data.get('title')
+        description = form_data.get('description')
+        service_type = form_data.get('service_type')
+        location = form_data.get('location')
+
+        if not all([title, description, service_type, location]):
+            flash("Please fill in all required fields", "error")
+            return False
+
+        try:
+            # Update fields
+            request_obj.title = title
+            request_obj.description = description
+            request_obj.service_type = service_type
+            request_obj.location = location
+            request_obj.urgency = form_data.get('urgency') or 'medium'
+            request_obj.skills_required = form_data.get('skills_required')
+
+            # Dates
+            start_date = form_data.get('start_date')
+            end_date = form_data.get('end_date')
+            if start_date:
+                request_obj.start_date = datetime.strptime(start_date, '%Y-%m-%d')
+            if end_date:
+                request_obj.end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+            request_obj.updated_at = datetime.utcnow()
+
+            db.session.commit()
+            flash("Request updated successfully!", "success")
+            return True
+
+        except Exception as e:
+            flash("Error updating request. Please try again.", "error")
+            return False
+        
+    @staticmethod
+    def cancel_request(request_id, pin_id=None):
+        """Soft delete a request by marking it cancelled"""
+        request_obj = PINRequestEntity.query.filter_by(request_id=request_id).first()
+
+        # Ownership check
+        if not request_obj or (pin_id and request_obj.requested_by_id != pin_id):
+            flash("Unauthorized or request not found", "error")
+            return False
+
+        # Prevent cancellation if already processed
+        if request_obj.status in ['active', 'completed']:
+            flash("This request cannot be cancelled as it is already being processed", "warning")
+            return False
+
+        try:
+            request_obj.status = 'cancelled'
+            request_obj.updated_at = datetime.utcnow()
+            db.session.commit()
+            flash("Request cancelled successfully", "success")
+            return True
+
+        except Exception as e:
+            flash("Error cancelling request. Please try again.", "error")
+            return False
+    
 

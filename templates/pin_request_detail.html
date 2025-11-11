@@ -133,6 +133,18 @@
 
         <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="{{ url_for('pin_my_requests') }}" class="btn btn-secondary">Back to Requests</a>
+
+            {% if request.status in ['pending', 'active'] %}
+            <a href="{{ url_for('pin_edit_request', request_id=request.request_id) }}" 
+            class="btn btn-primary">Edit Request</a>
+
+            <form method="POST" action="{{ url_for('pin_cancel_request', request_id=request.request_id) }}" style="display: inline;">
+                <button type="submit" class="btn btn-danger" 
+                        onclick="return confirm('Are you sure you want to cancel this request?')">
+                    Cancel Request
+                </button>
+            </form>
+            {% endif %}
             
             {% if request.status == 'pending' %}
             <form method="POST" action="{{ url_for('pin_activate_request', request_id=request.request_id) }}" style="display: inline;">

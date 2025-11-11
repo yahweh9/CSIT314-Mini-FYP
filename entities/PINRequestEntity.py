@@ -31,6 +31,7 @@ class PINRequestEntity(db.Model):
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

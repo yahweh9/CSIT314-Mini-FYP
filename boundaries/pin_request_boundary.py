@@ -32,14 +32,13 @@ def display_my_requests():
     return render_template('pin_my_requests.html', user=user, requests=active_requests)
 
 def display_request_history():
-    """Display user's request history"""
+    """Display user's request history (including cancelled)"""
     if 'user_id' not in session or session.get('role') != 'pin':
         return redirect('/')
-    
+
     user = UserEntity.query.get(session['user_id'])
-    completed_requests = PINRequestController.get_completed_requests(session['user_id'])
-    
-    return render_template('pin_request_history.html', user=user, requests=completed_requests)
+    all_requests = PINRequestController.get_completed_requests(session['user_id']) #completed request changed to all_requests
+    return render_template('pin_request_history.html', user=user, requests=all_requests)
 
 def display_request_detail(request_id):
     """Display detailed view of a specific request"""
@@ -54,3 +53,34 @@ def display_request_detail(request_id):
         return redirect(url_for('pin_my_requests'))
     
     return render_template('pin_request_detail.html', user=user, request=request_obj)
+
+def handle_edit_request(request_id):
+    """Display and handle editing a request"""
+    if 'user_id' not in session or session.get('role') != 'pin':
+        return redirect('/')
+
+    request_obj = PINRequestController.get_request_by_id(request_id, session['user_id'])
+    if not request_obj:
+        flash('Request not found', 'error')
+        return redirect(url_for('pin_my_requests'))
+
+    if request.method == 'POST':
+        success = PINRequestController.update_request(request_id, request.form, session['user_id'])
+        if success:
+            return redirect(url_for('pin_request_detail', request_id=request_id))
+        else:
+            return redirect(url_for('pin_edit_request', request_id=request_id))
+
+    # GET → show edit form
+    return render_template('pin_edit_request.html', request=request_obj)
+
+def handle_cancel_request(request_id):
+    """Handle cancelling a request (soft delete)"""
+    if 'user_id' not in session or session.get('role') != 'pin':
+        return redirect('/')
+
+    success = PINRequestController.cancel_request(request_id, session['user_id'])
+    if success:
+        return redirect(url_for('pin_my_requests'))
+    else:
+        return redirect(url_for('pin_request_detail', request_id=request_id))

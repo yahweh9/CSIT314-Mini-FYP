@@ -51,7 +51,16 @@ with app.app_context():
         seed_database()
         print("✅ Database seeded successfully!")
 
-@app.route('/', methods=['POST', 'GET'])                                         
+# GUEST HOMEPAGE ROUTE
+@app.route('/', methods=['POST', 'GET'])
+def homepage():
+    return display_homepage()
+
+@app.route('/csr_mission')
+def csr_mission():
+    return display_csr_mission()
+
+@app.route('/login_page', methods=['POST', 'GET'])                                         
 def login_page():
     return display_login_page()
 
@@ -177,6 +186,16 @@ def pin_request_history():
 @app.route('/pin/request/<request_id>')
 def pin_request_detail(request_id):
     return display_request_detail(request_id)
+
+@app.route('/pin/request/<string:request_id>/edit', methods=['GET', 'POST'])
+def pin_edit_request(request_id):
+    from boundaries.pin_request_boundary import handle_edit_request
+    return handle_edit_request(request_id)
+
+@app.route('/pin/request/<string:request_id>/cancel', methods=['POST'])
+def pin_cancel_request(request_id):
+    from boundaries.pin_request_boundary import handle_cancel_request
+    return handle_cancel_request(request_id)
 
 # PIN SELF-MANAGEMENT ROUTES
 @app.route('/pin/request/activate/<string:request_id>', methods=['POST'])
