@@ -9,6 +9,7 @@ from boundaries.csrrep_page import display_dashboard_csrrep
 from boundaries.cv_page import display_dashboard_cv, display_history_cv, display_report_page, display_account_page
 from boundaries.admin_page import display_dashboard_admin
 from boundaries.platform_manager_page import display_dashboard_platform_manager
+from boundaries.info_boundary import display_homepage, display_csr_mission
 
 # PIN Feature Boundaries
 from boundaries.pin_feedback_boundary import display_pin_feedback_dashboard, display_feedback_form, submit_feedback
