@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+
+{% block title %}My Shortlist - CSR Rep{% endblock %}
+
+{% block body %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}" style="font-size: 1.3rem; font-weight: 700; color: white !important; letter-spacing: 0.5px;">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-right: 15px;">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" style="background-color: rgba(255, 107, 107, 0.9); border: none; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-weight: 600; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="text-teal" style="color: #008B8B; font-weight: bold;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </h1>
+                    <p class="text-muted">Manage your saved volunteer opportunities</p>
+                </div>
+                <a href="{{ url_for('csrrep_search_opportunities') }}" class="btn" style="background-color: #008B8B; color: white; font-weight: 600;">
+                    <i class="fas fa-plus"></i> Browse More
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); color: white;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ shortlist_items|length }}</h3>
+                    <p class="card-text">Saved Opportunit{{ 'y' if shortlist_items|length == 1 else 'ies' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    {% if shortlist_items %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background-color: #f8fffe;">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('csrrep_my_shortlist') }}" class="row g-3">
+                        <!-- Search -->
+                        <div class="col-md-6">
+                            <label for="search" class="form-label" style="color: #008B8B; font-weight: 600;">Search</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   placeholder="Search your shortlist..." value="{{ request.args.get('search', '') }}">
+                        </div>
+
+                        <!-- Filter by Type -->
+                        <div class="col-md-3">
+                            <label for="service_type" class="form-label" style="color: #008B8B; font-weight: 600;">Service Type</label>
+                            <select class="form-select" id="service_type" name="service_type">
+                                <option value="">All Types</option>
+                                <option value="environmental" {% if request.args.get('service_type') == 'environmental' %}selected{% endif %}>Environmental</option>
+                                <option value="education" {% if request.args.get('service_type') == 'education' %}selected{% endif %}>Education</option>
+                                <option value="healthcare" {% if request.args.get('service_type') == 'healthcare' %}selected{% endif %}>Healthcare</option>
+                                <option value="community" {% if request.args.get('service_type') == 'community' %}selected{% endif %}>Community</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn w-100" style="background-color: #008B8B; color: white; font-weight: 600;">
+                                <i class="fas fa-search"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Shortlist Items -->
+    <div class="row">
+        {% if shortlist_items %}
+            {% for item, opp in shortlist_items %}
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100" style="transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1rem;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="badge" style="background-color: #008B8B; font-size: 0.75rem;">{{ opp.service_type.upper() if opp.service_type else 'N/A' }}</span>
+                                <span class="badge {% if opp.urgency == 'high' %}bg-danger{% elif opp.urgency == 'medium' %}bg-warning{% else %}bg-success{% endif %} ms-2">
+                                    {{ opp.urgency.capitalize() if opp.urgency else 'N/A' }}
+                                </span>
+                            </div>
+                            <small class="text-muted">Saved on {{ item.added_at.strftime('%d %b %Y') if item.added_at else 'Unknown' }}</small>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #008B8B; font-weight: bold;">{{ opp.title }}</h5>
+                        <p class="card-text text-muted">{{ opp.description[:100] if opp.description else 'No description' }}{% if opp.description and opp.description|length > 100 %}...{% endif %}</p>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt" style="color: #008B8B;"></i> {{ opp.location if opp.location else 'N/A' }}
+                            </small><br>
+                            {% if opp.start_date %}
+                            <small class="text-muted">
+                                <i class="fas fa-calendar" style="color: #008B8B;"></i> Starts {{ opp.start_date.strftime('%d %b %Y') }}
+                            </small><br>
+                            {% endif %}
+                            <small class="text-muted">
+                                <i class="fas fa-eye" style="color: #008B8B;"></i> {{ opp.view_count or 0 }} views
+                            </small>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            {% if opp.status == 'open' %}
+                                <span class="badge bg-success">Open</span>
+                            {% elif opp.status == 'closing_soon' %}
+                                <span class="badge bg-warning">Closing Soon</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Closed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-top">
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('csrrep_opportunity_detail', request_id=opp.request_id) }}" class="btn btn-sm" style="background-color: #008B8B; color: white;">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </a>
+                            <form class="removeShortlistForm d-inline w-100">
+                                <input type="hidden" name="request_id" value="{{ opp.request_id }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100 removeBtn">
+                                    <i class="fas fa-trash-alt"></i> Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" style="background-color: #e0f7f6; border: none;">
+                    <i class="fas fa-bookmark fa-3x mb-3" style="color: #008B8B; opacity: 0.4;"></i>
+                    <h5 style="color: #008B8B; font-weight: bold;">Your shortlist is empty</h5>
+                    <p class="text-muted mb-4">Save opportunities from the search page to view them here</p>
+                    <a href="{{ url_for('csrrep_search_opportunities') }}" class="btn" style="background-color: #008B8B; color: white; font-weight: 600;">
+                        <i class="fas fa-search"></i> Browse Opportunities
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" style="background-color: #10b981; color: white; border: none; font-weight: 600;">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" style="background-color: #f0fdf4; color: #166534; font-weight: 500;" id="successMessage">
+            Operation completed successfully!
+        </div>
+    </div>
+
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" style="background-color: #ef4444; color: white; border: none; font-weight: 600;">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" style="background-color: #fef2f2; color: #991b1b; font-weight: 500;" id="errorMessage">
+            An error occurred. Please try again.
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 10px 30px rgba(0, 139, 139, 0.15) !important;
+    }
+
+    .toast {
+        min-width: 300px;
+    }
+
+    .removeBtn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+
+<script>
+    // Show toast notification
+    function showToast(type, message) {
+        const toastElement = type === 'success' ? document.getElementById('successToast') : document.getElementById('errorToast');
+        const messageElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+        
+        messageElement.textContent = message;
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+
+    // Handle Remove from Shortlist
+    document.querySelectorAll('.removeShortlistForm').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const btn = this.querySelector('.removeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+            
+            fetch("{{ url_for('csrrep_remove_from_shortlist') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', data.message);
+                    // Remove the card after 1 second
+                    setTimeout(() => {
+                        this.closest('.col-md-6').remove();
+                        // Check if all items are removed
+                        if (document.querySelectorAll('.col-md-6').length === 0) {
+                            location.reload();
+                        }
+                    }, 1000);
+                } else {
+                    showToast('error', data.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove';
+                }
+            })
+            .catch(error => {
+                showToast('error', 'An error occurred. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove';
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+{% endblock %}

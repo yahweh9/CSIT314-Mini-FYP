@@ -81,6 +81,7 @@ from entities.FeedbackEntity import FeedbackEntity
 from entities.ShortlistEntity import ShortlistEntity  # NEW
 from entities.InterestEntity import InterestEntity
 from entities.RequestViewEntity import RequestViewEntity
+from entities.ShortlistEntity import ShortlistEntity  # NEW
 
 # Be resilient if the remote doesn’t have this yet.
 try:
