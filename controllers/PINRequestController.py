@@ -179,13 +179,13 @@ class PINRequestController:
             return False
 
         # Prevent cancellation if already processed
-        if request_obj.status in ['active', 'completed']:
+        if request_obj.status == 'completed':
             flash("This request cannot be cancelled as it is already being processed", "warning")
             return False
 
         try:
             request_obj.status = 'cancelled'
-            request_obj.updated_at = datetime.utcnow()
+            request_obj.cancelled_at = datetime.utcnow()
             db.session.commit()
             flash("Request cancelled successfully", "success")
             return True

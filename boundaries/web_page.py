@@ -1,6 +1,6 @@
 # boundary/web_boundary.py
 
-from flask import request, session, redirect, url_for, render_template
+from flask import request, session, redirect, url_for, render_template, flash
 from controllers.LoginController import LoginController
 from controllers.RegisterController import RegisterController
 
@@ -27,7 +27,10 @@ def display_login_page():
             elif role == 'cv':
                 return redirect(url_for('dashboard_cv'))
         else:
-            return "<script>alert('Wrong username or password!'); window.location.href='/';</script>"
+            flash("Wrong username or password!", "danger")
+            return redirect(url_for('login_page'))
+
+
 
     return render_template('login.html')
 
