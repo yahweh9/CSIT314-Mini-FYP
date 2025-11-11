@@ -5,7 +5,7 @@ from entities.UserEntity import UserEntity
 
 def display_dashboard_pin():
     if 'username' not in session:
-        return redirect('/')
+        return redirect(url_for('login_page'))
     
     user = UserEntity.query.filter_by(username=session['username'], role='pin').first()
     return render_template('dashboard_pin.html', user=user)
