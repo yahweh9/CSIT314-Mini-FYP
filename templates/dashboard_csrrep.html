@@ -1,21 +1,414 @@
 {% extends 'base.html' %}
 
+{% block title %}CSR Rep Dashboard{% endblock %}
+
 {% block head %}
-<title>CSR Rep Dashboard</title>
+<style>
+    :root {
+        --primary-color: #008B8B;
+        --secondary-color: #20B2AA;
+        --accent-color: #FFB6C1;
+        --light-bg: #F0F8F8;
+        --dark-text: #2C3E50;
+    }
+
+    body {
+        background-color: var(--light-bg);
+    }
+
+    .navbar {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white !important;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        margin: 0 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+        color: white !important;
+        transform: translateY(-2px);
+    }
+
+    .logout-btn {
+        background-color: rgba(255, 107, 107, 0.9);
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .logout-btn:hover {
+        background-color: rgba(255, 70, 70, 1);
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: white;
+    }
+
+    .user-info {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        margin-right: 15px;
+    }
+
+    .user-info strong {
+        color: white;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 139, 139, 0.15) !important;
+    }
+
+    .btn:hover {
+        transform: scale(1.02);
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-<div class="dashboard">
-    <h1>CSR Rep Dashboard</h1>
-    <div class="header-options">
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span class="user-info">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
-</div>
-<div>
-    <h1>Welcome, {{ user.fullname }}</h1>
-    <p>ID: {{ user.user_id }}</p>
-    <p>Username: {{ user.username }}</p>
-    <p>Email: {{ user.email }}</p>
-    <p>Organisation: {{ user.org }}</p>
+</nav>
+
+<!-- Original Dashboard Content Starts Here -->
+<div class="container-fluid mt-5">
+    <!-- Welcome Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); color: white;">
+                <div class="card-body p-4">
+                    <h1 class="card-title mb-2">Welcome, {{ user.fullname or user.username }}!</h1>
+                    <p class="card-text mb-0">CSR Representative Dashboard - Manage volunteer opportunities and track your impact</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <h4 style="color: #008B8B;">{{ active_opportunities }}</h4>
+                    <p class="text-muted mb-0">Active Opportunities</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <h4 style="color: #008B8B;">{{ shortlist_count }}</h4>
+                    <p class="text-muted mb-0">Saved Opportunities</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <h4 style="color: #008B8B;">{{ completed_count }}</h4>
+                    <p class="text-muted mb-0">Services Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <h4 style="color: #008B8B;">{{ total_hours }}</h4>
+                    <p class="text-muted mb-0">Hours Volunteered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Features Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 style="color: #008B8B; font-weight: bold; margin-bottom: 2rem;">
+                <i class="fas fa-star"></i> Key Features
+            </h2>
+        </div>
+    </div>
+
+    <!-- Feature 1: Search Opportunities -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100" style="transition: transform 0.3s, box-shadow 0.3s;">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1.5rem;">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-search fa-2x" style="color: #008B8B;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1" style="color: #008B8B; font-weight: bold;">Search Opportunities</h5>
+                            <p class="text-muted mb-0 small">Find and explore volunteer opportunities matching your interests</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Discover volunteer opportunities across different service types including Environmental, Education, Healthcare, and Community initiatives. 
+                        Filter by urgency level, location, and availability to find the perfect match for your skills and schedule.
+                    </p>
+                    <ul class="list-unstyled text-muted small">
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Advanced search and filtering capabilities</li>
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Filter by service type, urgency, and status</li>
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; View opportunity details and requirements</li>
+                        <li><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Quick save to shortlist functionality</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <a href="{{ url_for('csrrep_search_opportunities') }}" class="btn btn-lg w-100" style="background-color: #008B8B; color: white; font-weight: 600;">
+                        <i class="fas fa-search"></i> Explore Opportunities
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm" style="background-color: #f0fffe; border-left: 4px solid #008B8B;">
+                <div class="card-body">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 1rem;">
+                        <i class="fas fa-lightbulb"></i> Tip
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Use the search filters to narrow down opportunities based on your availability, skills, and interests. Don't forget to save your favorites to your shortlist!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature 2: Shortlist -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100" style="transition: transform 0.3s, box-shadow 0.3s;">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1.5rem;">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-bookmark fa-2x" style="color: #008B8B;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1" style="color: #008B8B; font-weight: bold;">My Shortlist</h5>
+                            <p class="text-muted mb-0 small">Manage your saved volunteer opportunities</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Keep track of opportunities you're interested in. Your shortlist helps you organize and plan your volunteer commitments. 
+                        You can filter, search, and manage all your saved opportunities in one place.
+                    </p>
+                    <ul class="list-unstyled text-muted small">
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; View all your saved opportunities</li>
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Filter by service type and search keywords</li>
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; See when you saved each opportunity</li>
+                        <li><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Quick access to opportunity details</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <a href="{{ url_for('csrrep_my_shortlist') }}" class="btn btn-lg w-100" style="background-color: #008B8B; color: white; font-weight: 600;">
+                        <i class="fas fa-bookmark"></i> View My Shortlist ({{ shortlist_count }})
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm" style="background-color: #f0fffe; border-left: 4px solid #008B8B;">
+                <div class="card-body">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 1rem;">
+                        <i class="fas fa-info-circle"></i> Info
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        You currently have {{ shortlist_count }} opportunities saved. Organize your shortlist to plan your volunteer schedule efficiently.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature 3: Completed Services & Analytics -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100" style="transition: transform 0.3s, box-shadow 0.3s;">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1.5rem;">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-check-circle fa-2x" style="color: #008B8B;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1" style="color: #008B8B; font-weight: bold;">Completed Services & Analytics</h5>
+                            <p class="text-muted mb-0 small">Track your volunteer history and community impact</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        View all your completed volunteer services and analyze your contribution impact. Track hours volunteered, people helped, 
+                        and your overall community impact score. Generate reports and download your achievement history.
+                    </p>
+                    <ul class="list-unstyled text-muted small">
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Complete service history and details</li>
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Advanced filtering and sorting options</li>
+                        <li class="mb-2"><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; View impact metrics and analytics</li>
+                        <li><i class="fas fa-check" style="color: #008B8B;"></i> &nbsp; Export data to CSV format</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('csrrep_completed_services') }}" class="btn btn-lg" style="background-color: #008B8B; color: white; font-weight: 600;">
+                            <i class="fas fa-list"></i> View Completed Services
+                        </a>
+                        <a href="{{ url_for('csrrep_history_analytics') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-chart-line"></i> View Analytics Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm" style="background-color: #f0fffe; border-left: 4px solid #008B8B;">
+                <div class="card-body">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 1rem;">
+                        <i class="fas fa-trophy"></i> Achievement Stats
+                    </h6>
+                    <div class="mb-3">
+                        <small class="text-muted">Total Hours Volunteered</small>
+                        <h5 style="color: #008B8B;">{{ total_hours }}h</h5>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Services Completed</small>
+                        <h5 style="color: #008B8B;">{{ completed_count }}</h5>
+                    </div>
+                    <div>
+                        <small class="text-muted">Community Impact Score</small>
+                        <h5 style="color: #008B8B;">{{ impact_score }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information Section -->
+    <div class="row mb-5">
+        <div class="col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1rem;">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 0;">
+                        <i class="fas fa-calendar"></i> Recent Activities
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                        <ul class="list-unstyled">
+                            {% for activity in recent_activities[:5] %}
+                            <li class="mb-3 pb-3 border-bottom">
+                                <small class="text-muted d-block">{{ activity.date.strftime('%d %b %Y') if activity.date else 'N/A' }}</small>
+                                <p class="mb-0" style="color: #008B8B;">{{ activity.description }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No recent activities</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1rem;">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 0;">
+                        <i class="fas fa-bell"></i> Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('csrrep_search_opportunities') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-search"></i> Find New Opportunities
+                        </a>
+                        <a href="{{ url_for('csrrep_my_shortlist') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-bookmark"></i> Check My Shortlist
+                        </a>
+                        <a href="{{ url_for('csrrep_completed_services') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-history"></i> View History
+                        </a>
+                        <a href="{{ url_for('csrrep_history_analytics') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chart-bar"></i> View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info text-center" style="background-color: #e0f7f6; border: 1px solid #008B8B; color: #008B8B;">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Need Help?</strong> Check out the feature descriptions above or contact your administrator for assistance.
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

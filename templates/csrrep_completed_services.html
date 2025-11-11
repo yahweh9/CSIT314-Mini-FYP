@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+
+{% block title %}Completed Services - CSR Rep{% endblock %}
+
+{% block body %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}" style="font-size: 1.3rem; font-weight: 700; color: white !important; letter-spacing: 0.5px;">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-right: 15px;">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" style="background-color: rgba(255, 107, 107, 0.9); border: none; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-weight: 600; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-teal" style="color: #008B8B; font-weight: bold;">
+                <i class="fas fa-check-circle"></i> Completed Services
+            </h1>
+            <p class="text-muted">Track your volunteer history and contribution impact</p>
+        </div>
+    </div>
+
+    <!-- Analytics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); color: white;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ stats.total_completed }}</h3>
+                    <p class="card-text">Total Services</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #20B2AA 0%, #40E0D0 100%); color: white;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ stats.average_rating | round(1) }}</h3>
+                    <p class="card-text">Avg Rating</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #40E0D0 0%, #7FFFD4 100%); color: #333;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ stats.most_common_service }}</h3>
+                    <p class="card-text">Most Common</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #5FD3D3 0%, #87CEEB 100%); color: white;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ completed_services.pages }}</h3>
+                    <p class="card-text">Total Pages</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background-color: #f8fffe;">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('csrrep_completed_services') }}" class="row g-3">
+                        <!-- Search -->
+                        <div class="col-md-3">
+                            <label for="search" class="form-label" style="color: #008B8B; font-weight: 600;">Search</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   placeholder="Search by title or location..." value="{{ current_search }}">
+                        </div>
+
+                        <!-- Service Type -->
+                        <div class="col-md-2">
+                            <label for="service_type" class="form-label" style="color: #008B8B; font-weight: 600;">Service Type</label>
+                            <select class="form-select" id="service_type" name="service_type">
+                                <option value="">All Types</option>
+                                {% for st in service_types %}
+                                <option value="{{ st }}" {% if current_service_type == st %}selected{% endif %}>{{ st.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Date From -->
+                        <div class="col-md-2">
+                            <label for="date_from" class="form-label" style="color: #008B8B; font-weight: 600;">From Date</label>
+                            <input type="date" class="form-control" id="date_from" name="date_from" 
+                                   value="{{ current_date_from }}">
+                        </div>
+
+                        <!-- Date To -->
+                        <div class="col-md-2">
+                            <label for="date_to" class="form-label" style="color: #008B8B; font-weight: 600;">To Date</label>
+                            <input type="date" class="form-control" id="date_to" name="date_to" 
+                                   value="{{ current_date_to }}">
+                        </div>
+
+                        <!-- Sort -->
+                        <div class="col-md-2">
+                            <label for="sort_by" class="form-label" style="color: #008B8B; font-weight: 600;">Sort By</label>
+                            <select class="form-select" id="sort_by" name="sort_by">
+                                <option value="completed_date_desc" {% if current_sort == 'completed_date_desc' %}selected{% endif %}>Most Recent</option>
+                                <option value="completed_date_asc" {% if current_sort == 'completed_date_asc' %}selected{% endif %}>Oldest</option>
+                                <option value="title_asc" {% if current_sort == 'title_asc' %}selected{% endif %}>Title A-Z</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter Button -->
+                        <div class="col-md-12 d-flex gap-2">
+                            <button type="submit" class="btn" style="background-color: #008B8B; color: white; font-weight: 600;">
+                                <i class="fas fa-filter"></i> Apply Filters
+                            </button>
+                            <a href="{{ url_for('csrrep_completed_services') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-redo"></i> Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <p class="text-muted">
+                Showing <span style="color: #008B8B; font-weight: 600;">{{ completed_services.total }}</span> total services 
+                (Page {{ completed_services.page }} of {{ completed_services.pages }})
+            </p>
+        </div>
+    </div>
+
+    <!-- Completed Services Table -->
+    <div class="row">
+        <div class="col-12">
+            {% if completed_services.items %}
+            <div class="table-responsive">
+                <table class="table table-hover" style="border: 1px solid #e0f7f6;">
+                    <thead style="background-color: #e0f7f6;">
+                        <tr>
+                            <th style="color: #008B8B; font-weight: bold;">Service Title</th>
+                            <th style="color: #008B8B; font-weight: bold;">Type</th>
+                            <th style="color: #008B8B; font-weight: bold; width: 25%;">Location</th>
+                            <th style="color: #008B8B; font-weight: bold; width: 15%;">Date Completed</th>
+                            <th style="color: #008B8B; font-weight: bold;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in completed_services.items %}
+                        <tr style="border-bottom: 1px solid #e0f7f6;">
+                            <td>
+                                <strong style="color: #008B8B;">{{ service.title }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge" style="background-color: #008B8B;">{{ service.service_type.upper() if service.service_type else 'N/A' }}</span>
+                            </td>
+                            <td style="padding: 12px; background-color: #f0fffe;">
+                                <div style="color: #008B8B; font-weight: 700; font-size: 0.95rem;">
+                                    <i class="fas fa-map-marker-alt" style="color: #008B8B; margin-right: 8px;"></i>
+                                    {{ service.location if service.location else 'N/A' }}
+                                </div>
+                            </td>
+                            <td style="padding: 12px; background-color: #f0fffe;">
+                                <div style="color: #008B8B; font-weight: 700; font-size: 0.95rem;">
+                                    <i class="fas fa-calendar-check" style="color: #008B8B; margin-right: 8px;"></i>
+                                    {% if service.completed_date %}
+                                        {{ service.completed_date.strftime('%d %b %Y') }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm" style="background-color: #008B8B; color: white; white-space: nowrap; border: none; cursor: pointer;" 
+                                        data-bs-toggle="modal" data-bs-target="#serviceModal"
+                                        onclick="showServiceDetails(this)"
+                                        data-title="{{ service.title }}"
+                                        data-type="{{ service.service_type.upper() if service.service_type else 'N/A' }}"
+                                        data-location="{{ service.location if service.location else 'N/A' }}"
+                                        data-date="{% if service.completed_date %}{{ service.completed_date.strftime('%d %b %Y') }}{% else %}N/A{% endif %}"
+                                        data-description="{{ service.description if service.description else 'No description available' }}"
+                                        title="View details">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if completed_services.pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous Page -->
+                    {% if completed_services.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('csrrep_completed_services', page=completed_services.prev_num, search=current_search, service_type=current_service_type, date_from=current_date_from, date_to=current_date_to, sort_by=current_sort) }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+                    {% for page_num in completed_services.iter_pages(left_edge=1, left_margin=1, right_margin=1, right_edge=1) %}
+                        {% if page_num %}
+                            {% if page_num == completed_services.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('csrrep_completed_services', page=page_num, search=current_search, service_type=current_service_type, date_from=current_date_from, date_to=current_date_to, sort_by=current_sort) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Next Page -->
+                    {% if completed_services.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('csrrep_completed_services', page=completed_services.next_num, search=current_search, service_type=current_service_type, date_from=current_date_from, date_to=current_date_to, sort_by=current_sort) }}">
+                            Next
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-check-circle fa-2x mb-3" style="color: #008B8B; opacity: 0.5;"></i>
+                <h5>No completed services yet</h5>
+                <p class="text-muted">Your completed volunteer services will appear here</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    table tbody tr:hover {
+        background-color: #f0fffe !important;
+    }
+</style>
+
+<!-- Service Details Modal -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <!-- Modal Header -->
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); color: white;">
+                <h5 class="modal-title" id="serviceModalLabel" style="font-weight: bold;">
+                    <i class="fas fa-info-circle me-2"></i>Service Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body" style="padding: 2rem; background-color: #ffffff;">
+                <!-- Service Title -->
+                <div class="mb-4">
+                    <h4 id="modalServiceTitle" style="color: #004D4D; font-weight: 900; font-size: 1.8rem; margin-bottom: 1rem;">Service Title</h4>
+                </div>
+
+                <!-- Service Details Grid -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div style="background-color: #e0f7f6; padding: 1.5rem; border-radius: 0.5rem; border-left: 5px solid #004D4D;">
+                            <small style="color: #004D4D; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Service Type</small>
+                            <p id="modalServiceType" style="color: #004D4D; font-weight: 900; font-size: 1.3rem; margin-top: 0.8rem; margin-bottom: 0;">N/A</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div style="background-color: #e0f7f6; padding: 1.5rem; border-radius: 0.5rem; border-left: 5px solid #004D4D;">
+                            <small style="color: #004D4D; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Date Completed</small>
+                            <p id="modalServiceDate" style="color: #004D4D; font-weight: 900; font-size: 1.3rem; margin-top: 0.8rem; margin-bottom: 0;">N/A</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="mb-4">
+                    <div style="background-color: #e0f7f6; padding: 1.5rem; border-radius: 0.5rem; border-left: 5px solid #004D4D;">
+                        <h6 style="color: #004D4D; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem;">
+                            <i class="fas fa-map-marker-alt me-2" style="color: #004D4D;"></i>Location
+                        </h6>
+                        <p id="modalServiceLocation" style="color: #004D4D; font-weight: 900; font-size: 1.2rem; margin-bottom: 0;">N/A</p>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <h6 style="color: #004D4D; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                        <i class="fas fa-file-alt me-2" style="color: #004D4D;"></i>Description
+                    </h6>
+                    <p id="modalServiceDescription" style="color: #1a1a1a; line-height: 1.7; font-weight: 700; font-size: 1rem;">N/A</p>
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="background-color: #e0f7f6; padding: 1.5rem; border-radius: 0.5rem; border-top: 3px solid #004D4D;">
+                    <small style="color: #004D4D; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 1rem;">Quick Actions</small>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-sm" style="background-color: #004D4D; color: white; font-weight: 900; border: none; font-size: 0.95rem; padding: 0.6rem 1rem;">
+                            <i class="fas fa-download"></i> Download Proof
+                        </button>
+                        <button class="btn btn-sm" style="background-color: #004D4D; color: white; font-weight: 900; border: none; font-size: 0.95rem; padding: 0.6rem 1rem;">
+                            <i class="fas fa-certificate"></i> Certificate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-top" style="background-color: #f8fffe; padding: 1rem;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showServiceDetails(button) {
+        // Get data from button attributes
+        const title = button.getAttribute('data-title');
+        const type = button.getAttribute('data-type');
+        const location = button.getAttribute('data-location');
+        const date = button.getAttribute('data-date');
+        const description = button.getAttribute('data-description');
+
+        // Update modal content
+        document.getElementById('modalServiceTitle').textContent = title;
+        document.getElementById('modalServiceType').textContent = type;
+        document.getElementById('modalServiceDate').textContent = date;
+        document.getElementById('modalServiceLocation').textContent = location;
+        document.getElementById('modalServiceDescription').textContent = description;
+    }
+</script>
+{% endblock %}

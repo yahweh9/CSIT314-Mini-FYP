@@ -1,403 +1,353 @@
-/* static/style.css */
+/* static/main.css - Fixed with Teal Background */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    margin: 0px;
-    padding: 0px;
-    font-family: "Poppins";
-    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    background-color: #71BDBF !important;  /* ✅ Teal background */
+    color: #ffffff !important;             /* ✅ White text for visibility */
+    min-height: 100vh;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: auto !important;
+}
+
+/* Override all text colors to be visible */
+body, body * {
+    background-color: transparent;
+}
+
+body h1, body h2, body h3, body h4, body h5, body h6 {
+    color: #ffffff !important;
+}
+
+body p, body span, body a, body li, body td, body th {
+    color: #ffffff !important;
+}
+
+/* LOGIN PAGE */
+.main-header {
+    margin: 0;
+    padding: 20px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    background: rgb(113, 189, 192);
-    color: #ffffff;
-}
-
-.main-header, .dashboard, .cv-dashboard {
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-    align-items: center;            
-    width: 100%;                    
-    background: #000408;
+    width: 100%;
     background: rgb(0, 120, 124);
     border-radius: 15px;
-    justify-content: space-between; 
-}
-
-
-.cv-account {
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-    align-items: center;            
-    width: 100%;                    
-    background: #000408;
-    background: rgb(0, 120, 124);
-    border-radius: 15px;
-    justify-content: space-between; 
-}
-
-.cv-account h1 {
-    font-size: 50px;
-    font-weight: 1000;
-    padding: 0px 20px;
+    justify-content: space-between;
 }
 
 .main-header h1 {
     font-size: 42px;
     font-weight: 700;
-    padding: 0px 0px 0px 30px;
+    padding: 0 30px;
+    color: #ffffff !important;
+    margin: 0;
+}
+
+.login-text {
+    margin: 10px 0;
+    font-size: 30px;
+    color: #ffffff !important;
+    text-align: center;
+}
+
+.login-box {
+    background: rgb(0, 120, 124);
+    border: 6px solid rgb(2, 82, 85);
+    padding: 40px 60px;
+    margin: 60px auto;
+    border-radius: 15px;
+    box-shadow: 0 0 35px rgba(0,0,0,0.3);
+    max-width: 500px;
+}
+
+.login-box input {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: 'Poppins';
+    background-color: #ffffff !important;
+    color: #333333 !important;
+}
+
+.login-box button {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #007bff;
+    color: white !important;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Poppins';
+}
+
+.login-box button:hover {
+    background-color: #0056b3;
+}
+
+.login-box a {
+    font-family: 'Poppins';
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff !important;
+    text-decoration: none;
+    display: block;
+    margin: 10px 0;
+}
+
+.login-box a:hover {
+    color: #6deeff !important;
+    font-weight: 600;
+}
+
+/* DASHBOARD */
+.dashboard {
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: rgb(0, 120, 124);
+    border-radius: 15px;
+    justify-content: space-between;
 }
 
 .dashboard h1 {
     font-size: 50px;
-    font-weight: 50;
-    padding: 0px 30px;
+    font-weight: 500;
+    padding: 0 30px;
+    color: #ffffff !important;
+    margin: 0;
 }
 
-.cv-dashboard h1 {
-    font-size: 50px;
-    font-weight: 1000;
-    padding: 15px 20px;
-}
-
-.welcome-message h2 {
-    font-size: 30px;
-    font-weight: 570;
-    padding: 20px 0px 0px 0px;
-}
-
-.welcome-message h3 {
-    font-size: 24px;
-    font-weight: 570;
-    padding: 20px 0px 0px 0px;
-}
-
-.header-options a, .dashboard a {
+.dashboard a {
     font-family: 'Poppins';
-    font-size: 23px;
-    font-weight: 670;
+    font-size: 18px;
+    font-weight: 600;
     padding: 15px;
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: none;
     transition: color 0.3s;
 }
 
-.header-options a:hover {
+.dashboard a:hover {
     color: #ffd166;
-}
-
-.main-header a:hover, .dashboard a:hover{
     text-decoration: underline;
 }
 
-.login-text {
-    margin: 10px 0px;
-    font-size: 30px;
+/* CARDS - Make them stand out on teal background */
+.card {
+    background-color: #ffffff !important;
+    color: #333333 !important;
 }
 
-.login-box, .register-box, .successful-registration-box {
-    background: rgb(0, 120, 124);
-    border: 6px solid rgb(2, 82, 85);
-    padding: 0px 60px 5px;
-    margin: 60px;
-    border-radius: 15px;
-    box-shadow: 0 0 35px rgba(0,0,0,0.3);
-}
-.login-box input, .register-box input {
-    margin: 10px;
-}
-.login-box a,  .register-box a{
-    font-family: 'Poppins';
-    font-size: 13px;
-    font-weight: 500;
-    padding: 0px;
-    color: rgb(0, 39, 41);   
-}
-.login-box a:hover, .register-box a:hover {
-    font-weight: 600;
-    color: #6deeff; 
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6 {
+    color: #008B8B !important;
 }
 
-.login-box button, .register-box button, .successful-registration-box button {
-    display: block;
-    margin: 15px 0px;
-    padding: 5px 12px;
-    cursor: pointer;
-}
-.login-box button:hover, .register-box button:hover {
-    display: block;
-    margin: 15px 0px;
-    padding: 5px 12px
+.card p, .card span, .card small, .card a, .card li {
+    color: #333333 !important;
 }
 
-.sort-options {
-    padding: 20px;
-    max-width: 900px; 
-    margin: 0 auto;
+.card-header {
+    background-color: #e0f7f6 !important;
+    color: #008B8B !important;
 }
 
+.card-header h5, .card-header h6 {
+    color: #008B8B !important;
+}
+
+.card-body p, .card-body span, .card-body small {
+    color: #333333 !important;
+}
+
+/* Make text in card body visible */
+.card-body {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+}
+
+.card-body * {
+    color: #333333 !important;
+}
+
+/* TABLES */
 .my-table {
-  border-collapse: collapse;
-  width: 70%;
-  margin: 30px auto;
-  background-color: #ffffff;
-  color: #00474f;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-collapse: collapse;
+    width: 90%;
+    margin: 30px auto;
+    background-color: #ffffff;
+    color: #00474f;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .my-table th {
-  background-color: #00787c;
-  color: white;
-  text-align: left;
-  padding: 14px;
-  font-size: 18px;
-  letter-spacing: 0.5px;
+    background-color: #00787c;
+    color: #ffffff !important;
+    text-align: left;
+    padding: 14px;
+    font-size: 18px;
 }
 
 .my-table td {
-  padding: 12px;
-  border-bottom: 1px solid #d6d6d6;
-  font-size: 16px;
+    padding: 12px;
+    border-bottom: 1px solid #d6d6d6;
+    font-size: 16px;
+    color: #00474f !important;
+    background-color: #ffffff;
 }
 
 .my-table tr:hover {
-  background-color: #e7f7f7;
-  transition: 0.3s;
+    background-color: #e7f7f7;
 }
 
 .my-table tr:nth-child(even) {
-  background-color: #f4fafa;
+    background-color: #f4fafa;
 }
 
-/* Ensure rating stars stay in one line for CV history */
-.star-rating {
-    white-space: nowrap;
-}
-
-.cv-report-table {
-  border-collapse: collapse;
-  width: 90%;
-  margin: 30px auto;
-  background-color: #ffffff;
-  color: #00474f;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.cv-report-table th {
-  background-color: #00787c;
-  color: white;
-  text-align: left;
-  padding: 14px;
-  font-size: 18px;
-  letter-spacing: 0.5px;
-}
-
-.cv-report-table td {
-  padding: 12px;
-  border-bottom: 1px solid #d6d6d6;
-  font-size: 16px;
-}
-
-.cv-report-table tr:hover {
-  background-color: #e7f7f7;
-  transition: 0.3s;
-}
-
-.cv-report-table tr:nth-child(even) {
-  background-color: #f4fafa;
-}
-
-
-.cv-service-type {
-    text-transform: capitalize;
-}
-
+/* BADGES */
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
     font-weight: 600;
-    color: white;
+    color: white !important;
     text-transform: capitalize;
 }
-/* Different colors for each status */
+
 .status-badge.pending {
-    background-color: #f1c40f; /* yellow */
+    background-color: #f1c40f;
+    color: #333 !important;
 }
+
 .status-badge.active {
-    background-color: #2ecc71; /* green */
+    background-color: #2ecc71;
 }
-.status-badge.late {
-    background-color: #e74c3c; /* red */
-}
+
 .status-badge.completed {
-    background-color: #95a5a6; /* grey */
+    background-color: #95a5a6;
 }
 
 .urgency-badge {
     padding: 6px 12px;
     border-radius: 15px;
     font-weight: 600;
-    color: white;
+    color: white !important;
     text-transform: capitalize;
 }
-/* Different colors for each status */
-.urgency-badge.medium {
-    background-color: #f1c40f; /* yellow */
-}
-.urgency-badge.low {
-    background-color: #01b64c; /* green */
-}
-.urgency-badge.completed {
-    background-color: #95a5a6; /* grey */
-}
+
 .urgency-badge.high {
-    background-color: #e74c3c; /* red */
+    background-color: #e74c3c;
 }
 
-.no-requests-message {
-    font-size: 25px;
-    font-weight: 400;
-    padding: 30px 20px;
+.urgency-badge.medium {
+    background-color: #f1c40f;
+    color: #333 !important;
 }
 
-.view-btn {
-    background-color: #007bff;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+.urgency-badge.low {
+    background-color: #01b64c;
 }
 
-.view-btn:hover {
-    background-color: #0056b3;
+/* BUTTONS */
+.btn {
+    font-family: 'Poppins';
 }
 
-.modal-title {
-    font-family: "Poppins";
-    color: #00353b;
+.btn-primary {
+    background-color: #007bff !important;
+    color: #ffffff !important;
 }
 
-.modal-body {
-    font-family: "Poppins";
-    color: #00353b;
+.btn-primary:hover {
+    background-color: #0056b3 !important;
 }
 
-.download-btn {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    margin: 15px 0px 0px 0px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.btn-outline-secondary {
+    color: #333333 !important;
+    border-color: #999 !important;
+    background-color: #ffffff !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #e9ecef !important;
+    color: #333333 !important;
+}
+
+/* ALERTS */
+.alert {
+    background-color: #e0f7f6 !important;
+    color: #008B8B !important;
+    border-color: #008B8B !important;
+}
+
+.alert-info {
+    background-color: #d1ecf1 !important;
+    color: #0c5460 !important;
+    border-color: #bee5eb !important;
+}
+
+/* FORM ELEMENTS */
+.form-control {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #ddd !important;
+}
+
+.form-control:focus {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border-color: #008B8B !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 139, 139, 0.25);
+}
+
+.form-select {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #ddd !important;
+}
+
+.form-select:focus {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border-color: #008B8B !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 139, 139, 0.25);
+}
+
+.form-label {
+    color: #008B8B !important;
     font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-.download-btn:hover {
-    background-color: #2c53be;
-    transform: translateY(-2px);
+/* CONTAINER */
+.container, .container-fluid {
+    color: #ffffff !important;
 }
 
-.download-btn:active {
-    transform: translateY(0);
-    background-color: #09666e;
+.text-muted {
+    color: #666666 !important;
 }
 
-.main-btn {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.main-btn:hover {
-    background-color: #0d8a96;
-    transform: translateY(-2px);
-}
-
-.main-btn:active {
-    transform: translateY(0);
-    background-color: #09666e;
-}
-
-.print-btn {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.print-btn:hover {
-    background-color: #0d8a96;
-    transform: translateY(-2px);
-}
-
-.print-btn:active {
-    transform: translateY(0);
-    background-color: #09666e;
-}
-
-/* Improved heading colors for better readability */
-.dashboard h1,
-.cv-dashboard h1,
-.welcome-message h2 {
-    color: #e8f4f5; /* Light cyan-white for better contrast */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Adds subtle depth */
-}
-
-/* Improve table text contrast */
-.my-table {
-    color: #00363a; /* Dark teal for better readability on white background */
-}
-
-/* Keep table headers white for contrast */
-.my-table th {
-    color: #ffffff; /* Maintain white text on dark headers */
-}
-
-/* Improve status badge text visibility */
-.status-badge {
-    color: #ffffff;
-    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.3); /* Better contrast on colored backgrounds */
-}
-
-/* Improve modal text for better contrast */
-.modal-title {
-    color: #00272a; /* Dark teal for modal titles */
-}
-
-.modal-body {
-    color: #004148; /* Medium teal for modal body text */
-}
-
-/* Improve no-requests message */
-.no-requests-message {
-    color: #e8f4f5; /* Light cyan-white */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
+/* PRINT STYLES */
 @media print {
   body {
     margin-top: 0 !important;
@@ -405,40 +355,31 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     background-color: rgb(113, 189, 192) !important;
-    color: #000 !important; /* <-- Make text visible on light background */
+    color: #000 !important;
   }
 
   h1, h2, h3, p, td {
     color: #111111 !important;
-
   }
   
   th {
-    color: #ffffff !important; /* ensures all text turns black when printing */
+    color: #ffffff !important;
   }
 
   .print-btn {
-    display: none; /* hides download button in print */
+    display: none;
   }
 
-    /* Prevent row splitting */
-    tr, td, th {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-    }
+  tr, td, th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-    /* Repeat header each page */
-    thead {
-        display: table-header-group !important;
-    }
-    tfoot {
-        display: table-footer-group !important;
-    }
-
-    /* Optional: prevent container splitting */
-    .report-table-wrapper {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        page-break-inside: avoid !important;
-    }
+  thead {
+    display: table-header-group !important;
+  }
+  
+  tfoot {
+    display: table-footer-group !important;
+  }
 }

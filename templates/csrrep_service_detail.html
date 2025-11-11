@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ service.title }} - Service Details{% endblock %}
+
+{% block body %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}" style="font-size: 1.3rem; font-weight: 700; color: white !important; letter-spacing: 0.5px;">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-right: 15px;">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" style="background-color: rgba(255, 107, 107, 0.9); border: none; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-weight: 600; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <!-- Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ url_for('csrrep_completed_services') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Back to Completed Services
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Left Column: Details -->
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 2rem;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 style="color: #008B8B; font-weight: bold; margin-bottom: 0.5rem;">{{ service.title }}</h1>
+                            <div class="mt-2">
+                                <span class="badge" style="background-color: #008B8B; font-size: 0.85rem;">{{ service.service_type.upper() }}</span>
+                                <span class="badge bg-success ms-2">
+                                    <i class="fas fa-check-circle"></i> Completed
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Key Metrics -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="text-center p-3" style="background-color: #f0fffe; border-radius: 0.5rem;">
+                                <small class="text-muted d-block">Hours Volunteered</small>
+                                <h4 style="color: #008B8B; margin-top: 0.5rem;">{{ service.hours_completed }}h</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3" style="background-color: #f0fffe; border-radius: 0.5rem;">
+                                <small class="text-muted d-block">Impact Level</small>
+                                <h4 style="color: #008B8B; margin-top: 0.5rem;">
+                                    <span class="badge bg-success">{{ service.impact_level }}</span>
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3" style="background-color: #f0fffe; border-radius: 0.5rem;">
+                                <small class="text-muted d-block">Impact Score</small>
+                                <h4 style="color: #008B8B; margin-top: 0.5rem;">+{{ service.impact_points }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service Details -->
+                    <div class="mb-4">
+                        <h5 style="color: #008B8B; font-weight: bold;">Service Overview</h5>
+                        <p>{{ service.description }}</p>
+                    </div>
+
+                    <!-- Location & Date -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 style="color: #008B8B; font-weight: bold;">Location</h6>
+                            <p>
+                                <i class="fas fa-map-marker-alt" style="color: #008B8B;"></i> {{ service.location }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 style="color: #008B8B; font-weight: bold;">Date Completed</h6>
+                            <p>
+                                <i class="fas fa-calendar-check" style="color: #008B8B;"></i> {{ service.date_completed.strftime('%d %B %Y') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- What You Did -->
+                    <div class="alert" style="background-color: #f0fffe; border-left: 4px solid #008B8B;">
+                        <h6 style="color: #008B8B; font-weight: bold;">What You Accomplished</h6>
+                        <p class="mb-0">{{ service.accomplishments or 'Details about your contribution will appear here.' }}</p>
+                    </div>
+
+                    <!-- Impact Section -->
+                    <div class="mb-4">
+                        <h5 style="color: #008B8B; font-weight: bold;">Your Impact</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <i class="fas fa-people-carry" style="color: #008B8B;"></i>
+                                <strong>People Helped:</strong> {{ service.people_helped }}
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-leaf" style="color: #008B8B;"></i>
+                                <strong>Environmental Impact:</strong> {{ service.environmental_impact or 'Not specified' }}
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-heart" style="color: #008B8B;"></i>
+                                <strong>Social Impact:</strong> {{ service.social_impact or 'Not specified' }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Feedback/Testimonials -->
+                    {% if service.feedback %}
+                    <div class="card border-0" style="background-color: #f0fffe;">
+                        <div class="card-body">
+                            <h6 style="color: #008B8B; font-weight: bold;">Feedback from Organization</h6>
+                            <blockquote class="blockquote mb-0">
+                                <p>{{ service.feedback }}</p>
+                                <footer class="blockquote-footer text-muted">{{ service.feedback_from }}</footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Certificate & Stats -->
+        <div class="col-lg-4">
+            <!-- Certificate Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header border-0" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); color: white; padding: 2rem; text-align: center;">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-certificate"></i> Completion Certificate
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-muted mb-3">Your contribution has been recognized!</p>
+                    <button class="btn btn-sm" style="background-color: #008B8B; color: white;">
+                        <i class="fas fa-download"></i> Download Certificate
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service Stats Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1rem;">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 0;">Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Service Type</small>
+                        <p style="color: #008B8B; font-weight: bold;">{{ service.service_type.title() }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <small class="text-muted">Status</small>
+                        <p>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> Completed
+                            </span>
+                        </p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <small class="text-muted">Date Registered</small>
+                        <p style="color: #008B8B;">{{ service.date_registered.strftime('%d %b %Y') }}</p>
+                    </div>
+                    <hr>
+                    <div>
+                        <small class="text-muted">Last Updated</small>
+                        <p style="color: #008B8B;">{{ service.date_updated.strftime('%d %b %Y, %I:%M %p') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share & Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 1rem;">Share Your Achievement</h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-share-alt"></i> Share on Social Media
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-envelope"></i> Email Achievement
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ opportunity.title }} - CSR Rep{% endblock %}
+
+{% block body %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}" style="font-size: 1.3rem; font-weight: 700; color: white !important; letter-spacing: 0.5px;">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-right: 15px;">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" style="background-color: rgba(255, 107, 107, 0.9); border: none; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-weight: 600; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <!-- Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ referrer or url_for('csrrep_search_opportunities') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Left Column: Details -->
+        <div class="col-lg-8">
+            <!-- Header Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 2rem;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 style="color: #008B8B; font-weight: bold; margin-bottom: 0.5rem;">{{ opportunity.title }}</h1>
+                            <div class="mt-2">
+                                <span class="badge" style="background-color: #008B8B; font-size: 0.85rem;">{{ opportunity.service_type.upper() if opportunity.service_type else 'N/A' }}</span>
+                                <span class="badge {% if opportunity.urgency == 'high' %}bg-danger{% elif opportunity.urgency == 'medium' %}bg-warning{% else %}bg-success{% endif %} ms-2">
+                                    {{ opportunity.urgency.capitalize() if opportunity.urgency else 'N/A' }}
+                                </span>
+                                {% if opportunity.status == 'open' %}
+                                    <span class="badge bg-success ms-2">Open</span>
+                                {% elif opportunity.status == 'closing_soon' %}
+                                    <span class="badge bg-warning ms-2">Closing Soon</span>
+                                {% else %}
+                                    <span class="badge bg-secondary ms-2">Closed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">Views: <strong>{{ opportunity.view_count or 0 }}</strong></small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Quick Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-map-marker-alt" style="color: #008B8B;"></i> Location
+                                </small>
+                                <h5 style="color: #008B8B;">
+                                    {{ opportunity.location if opportunity.location else 'N/A' }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-calendar" style="color: #008B8B;"></i> Posted Date
+                                </small>
+                                <h5 style="color: #008B8B; font-size: 1rem;">
+                                    {% if opportunity.created_at %}
+                                        {{ opportunity.created_at.strftime('%d %B %Y') }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h5 style="color: #008B8B; font-weight: bold;">About This Opportunity</h5>
+                        <p style="line-height: 1.8; color: #2C3E50;">
+                            {{ opportunity.description if opportunity.description else 'No description provided.' }}
+                        </p>
+                    </div>
+
+                    <!-- Location & Timeline -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 style="color: #008B8B; font-weight: bold;">Start Date</h6>
+                            <p>
+                                <i class="fas fa-play-circle" style="color: #008B8B;"></i>
+                                {% if opportunity.start_date %}
+                                    {{ opportunity.start_date.strftime('%d %B %Y') }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 style="color: #008B8B; font-weight: bold;">End Date</h6>
+                            <p>
+                                <i class="fas fa-stop-circle" style="color: #008B8B;"></i>
+                                {% if opportunity.end_date %}
+                                    {{ opportunity.end_date.strftime('%d %B %Y') }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="alert" style="background-color: #f0fffe; border-left: 4px solid #008B8B;">
+                        <h6 style="color: #008B8B; font-weight: bold;">
+                            <i class="fas fa-checklist"></i> Requirements
+                        </h6>
+                        <p class="mb-0">
+                            {{ opportunity.requirements if opportunity.requirements else 'No specific requirements' }}
+                        </p>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-eye" style="color: #008B8B;"></i> Views
+                            </p>
+                            <p style="color: #008B8B; font-weight: 600; font-size: 1.3rem;">
+                                {{ opportunity.view_count or 0 }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-bookmark" style="color: #008B8B;"></i> Saved By
+                            </p>
+                            <p style="color: #008B8B; font-weight: 600; font-size: 1.3rem;">
+                                {{ opportunity.shortlist_count or 0 }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Action Card -->
+        <div class="col-lg-4">
+            <!-- Action Card -->
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <p class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            {% if opportunity.status == 'open' %}
+                                <strong>Status:</strong> This opportunity is open for volunteers!
+                            {% elif opportunity.status == 'closing_soon' %}
+                                <strong>Status:</strong> This opportunity is closing soon. Don't miss out!
+                            {% else %}
+                                <strong>Status:</strong> This opportunity is currently closed.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {% if in_shortlist %}
+                            <button type="button" class="btn" style="background-color: #008B8B; color: white; font-weight: 600;" disabled>
+                                <i class="fas fa-bookmark"></i> Already Saved
+                            </button>
+                            <form id="removeShortlistForm" class="d-grid">
+                                <input type="hidden" name="request_id" value="{{ opportunity.request_id }}">
+                                <button type="submit" class="btn btn-outline-danger" style="font-weight: 600;">
+                                    <i class="fas fa-trash"></i> Remove from Shortlist
+                                </button>
+                            </form>
+                        {% else %}
+                            <form id="addShortlistForm" class="d-grid">
+                                <input type="hidden" name="request_id" value="{{ opportunity.request_id }}">
+                                <button type="submit" class="btn" style="background-color: #008B8B; color: white; font-weight: 600;">
+                                    <i class="fas fa-bookmark"></i> Save to Shortlist
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Share Card -->
+                    <hr class="my-4">
+
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 1rem;">Share</h6>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy Link" onclick="copyToClipboard()">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <hr class="my-4">
+
+                    <h6 style="color: #008B8B; font-weight: bold;">Posted By</h6>
+                    {% if pin_user %}
+                        <p class="text-muted mb-2">
+                            <small>
+                                <strong>{{ pin_user.name if pin_user.name else 'N/A' }}</strong>
+                            </small>
+                        </p>
+                        <p class="text-muted mb-2">
+                            <small>
+                                <i class="fas fa-envelope"></i> {{ pin_user.email if pin_user.email else 'Not provided' }}
+                            </small>
+                        </p>
+                        <p class="text-muted mb-0">
+                            <small>
+                                <i class="fas fa-phone"></i> {{ pin_user.phone if pin_user.phone else 'Not provided' }}
+                            </small>
+                        </p>
+                    {% else %}
+                        <p class="text-muted">
+                            <small>Contact information not available</small>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" style="background-color: #10b981; color: white; border: none; font-weight: 600;">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" style="background-color: #f0fdf4; color: #166534; font-weight: 500;" id="successMessage">
+            Operation completed successfully!
+        </div>
+    </div>
+
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" style="background-color: #ef4444; color: white; border: none; font-weight: 600;">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" style="background-color: #fef2f2; color: #991b1b; font-weight: 500;" id="errorMessage">
+            An error occurred. Please try again.
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 992px) {
+        .sticky-top {
+            position: static !important;
+            top: auto !important;
+        }
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 139, 139, 0.12) !important;
+    }
+
+    .toast {
+        min-width: 300px;
+    }
+</style>
+
+<script>
+    // Show toast notification
+    function showToast(type, message) {
+        const toastElement = type === 'success' ? document.getElementById('successToast') : document.getElementById('errorToast');
+        const messageElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+        
+        messageElement.textContent = message;
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+
+    // Copy to clipboard
+    function copyToClipboard() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('success', 'Link copied to clipboard!');
+        }).catch(() => {
+            showToast('error', 'Failed to copy link');
+        });
+    }
+
+    // Handle Add to Shortlist
+    document.getElementById('addShortlistForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch("{{ url_for('csrrep_add_to_shortlist') }}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('success', data.message);
+                // Reload page after 1.5 seconds to reflect changes
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast('error', data.message);
+            }
+        })
+        .catch(error => {
+            showToast('error', 'An error occurred. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+
+    // Handle Remove from Shortlist
+    document.getElementById('removeShortlistForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch("{{ url_for('csrrep_remove_from_shortlist') }}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('success', data.message);
+                // Reload page after 1.5 seconds to reflect changes
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast('error', data.message);
+            }
+        })
+        .catch(error => {
+            showToast('error', 'An error occurred. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+</script>
+{% endblock %}

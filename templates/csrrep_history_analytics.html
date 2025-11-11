@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard - CSR Rep{% endblock %}
+
+{% block body %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}" style="font-size: 1.3rem; font-weight: 700; color: white !important; letter-spacing: 0.5px;">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-right: 15px;">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" style="background-color: rgba(255, 107, 107, 0.9); border: none; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-weight: 600; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid mt-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-teal" style="color: #008B8B; font-weight: bold;">
+                <i class="fas fa-chart-line"></i> Your Impact Dashboard
+            </h1>
+            <p class="text-muted">Track your volunteer contributions and community impact</p>
+        </div>
+    </div>
+
+    <!-- Main KPI Cards -->
+    <div class="row mb-4">
+        <!-- Total Hours -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="card-text opacity-75">Total Hours</p>
+                            <h2 class="card-title mb-0">{{ total_hours }}</h2>
+                        </div>
+                        <i class="fas fa-clock fa-3x opacity-25"></i>
+                    </div>
+                    <small class="d-block mt-2">
+                        <i class="fas fa-arrow-up"></i> +{{ hours_this_month }} this month
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Services -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #20B2AA 0%, #40E0D0 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="card-text opacity-75">Services Completed</p>
+                            <h2 class="card-title mb-0">{{ total_services }}</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x opacity-25"></i>
+                    </div>
+                    <small class="d-block mt-2">
+                        <i class="fas fa-arrow-up"></i> +{{ services_this_month }} this month
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Score -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #40E0D0 0%, #7FFFD4 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="card-text opacity-75">Impact Score</p>
+                            <h2 class="card-title mb-0">{{ impact_score }}</h2>
+                        </div>
+                        <i class="fas fa-star fa-3x opacity-25"></i>
+                    </div>
+                    <small class="d-block mt-2">
+                        <i class="fas fa-medal"></i> {{ impact_tier }} Tier
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- People Helped -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #5FD3D3 0%, #87CEEB 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="card-text opacity-75">People Helped</p>
+                            <h2 class="card-title mb-0">{{ people_helped }}</h2>
+                        </div>
+                        <i class="fas fa-users fa-3x opacity-25"></i>
+                    </div>
+                    <small class="d-block mt-2">
+                        <i class="fas fa-heart"></i> Community Impact
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Hours Over Time -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1.5rem;">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 0;">Hours Volunteered (Last 6 Months)</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="hoursChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Types Distribution -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1.5rem;">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 0;">Services by Type</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Badges -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1.5rem;">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 0;">
+                        <i class="fas fa-trophy"></i> Your Achievements
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Badge 1 -->
+                        <div class="col-md-3 mb-3 text-center">
+                            <div class="p-3" style="background-color: #f0fffe; border-radius: 1rem;">
+                                <i class="fas fa-star fa-2x mb-2" style="color: #FFD700;"></i>
+                                <p class="font-weight-bold" style="color: #008B8B;">
+                                    {% if total_hours >= 100 %}
+                                        <i class="fas fa-check-circle" style="color: #008B8B;"></i> Century Volunteer
+                                    {% else %}
+                                        <i class="fas fa-lock" style="color: #ccc;"></i> Century Volunteer
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">100+ hours</small>
+                            </div>
+                        </div>
+
+                        <!-- Badge 2 -->
+                        <div class="col-md-3 mb-3 text-center">
+                            <div class="p-3" style="background-color: #f0fffe; border-radius: 1rem;">
+                                <i class="fas fa-heart fa-2x mb-2" style="color: #FF69B4;"></i>
+                                <p class="font-weight-bold" style="color: #008B8B;">
+                                    {% if total_services >= 20 %}
+                                        <i class="fas fa-check-circle" style="color: #008B8B;"></i> Dedicated Helper
+                                    {% else %}
+                                        <i class="fas fa-lock" style="color: #ccc;"></i> Dedicated Helper
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">20+ services</small>
+                            </div>
+                        </div>
+
+                        <!-- Badge 3 -->
+                        <div class="col-md-3 mb-3 text-center">
+                            <div class="p-3" style="background-color: #f0fffe; border-radius: 1rem;">
+                                <i class="fas fa-leaf fa-2x mb-2" style="color: #228B22;"></i>
+                                <p class="font-weight-bold" style="color: #008B8B;">
+                                    {% if environmental_hours >= 50 %}
+                                        <i class="fas fa-check-circle" style="color: #008B8B;"></i> Earth Guardian
+                                    {% else %}
+                                        <i class="fas fa-lock" style="color: #ccc;"></i> Earth Guardian
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">50+ environmental hours</small>
+                            </div>
+                        </div>
+
+                        <!-- Badge 4 -->
+                        <div class="col-md-3 mb-3 text-center">
+                            <div class="p-3" style="background-color: #f0fffe; border-radius: 1rem;">
+                                <i class="fas fa-users fa-2x mb-2" style="color: #4169E1;"></i>
+                                <p class="font-weight-bold" style="color: #008B8B;">
+                                    {% if people_helped >= 500 %}
+                                        <i class="fas fa-check-circle" style="color: #008B8B;"></i> Life Changer
+                                    {% else %}
+                                        <i class="fas fa-lock" style="color: #ccc;"></i> Life Changer
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">500+ people helped</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 style="color: #008B8B; font-weight: bold; margin-bottom: 1.5rem;">Quick Actions</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('csrrep_search_opportunities') }}" class="btn" style="background-color: #008B8B; color: white;">
+                            <i class="fas fa-search"></i> Find Opportunities
+                        </a>
+                        <a href="{{ url_for('csrrep_completed_services') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list"></i> View History
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-download"></i> Download Report
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-certificate"></i> View Certificates
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Hours Chart
+    const hoursCtx = document.getElementById('hoursChart').getContext('2d');
+    new Chart(hoursCtx, {
+        type: 'line',
+        data: {
+            labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+            datasets: [{
+                label: 'Hours',
+                data: {{ hours_monthly or [0, 0, 0, 0, 0, 0] }},
+                borderColor: '#008B8B',
+                backgroundColor: 'rgba(0, 139, 139, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#008B8B',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#666' }
+                },
+                x: {
+                    ticks: { color: '#666' }
+                }
+            }
+        }
+    });
+
+    // Service Type Chart
+    const typeCtx = document.getElementById('typeChart').getContext('2d');
+    new Chart(typeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Environmental', 'Education', 'Healthcare', 'Community'],
+            datasets: [{
+                data: {{ service_type_counts or [0, 0, 0, 0] }},
+                backgroundColor: [
+                    '#008B8B',
+                    '#20B2AA',
+                    '#40E0D0',
+                    '#7FFFD4'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#666', padding: 15 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

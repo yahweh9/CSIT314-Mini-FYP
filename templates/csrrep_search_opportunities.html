@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Opportunities - CSR Rep{% endblock %}
+
+{% block body %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: linear-gradient(135deg, #008B8B 0%, #20B2AA 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{{ url_for('dashboard_csrrep') }}" style="font-size: 1.3rem; font-weight: 700; color: white !important; letter-spacing: 0.5px;">
+            <i class="fas fa-heart"></i> CSR Volunteer System
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_search_opportunities') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> Search Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('csrrep_my_shortlist') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-bookmark"></i> My Shortlist
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard_csrrep') }}" style="color: rgba(255, 255, 255, 0.9) !important; margin: 0 8px; font-weight: 500; font-size: 0.95rem;">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- User Info & Logout -->
+                {% if session.get('username') %}
+                    <li class="nav-item">
+                        <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-right: 15px;">
+                            <i class="fas fa-user-circle"></i> <strong>{{ session.get('username') }}</strong>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" style="background-color: rgba(255, 107, 107, 0.9); border: none; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-weight: 600; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-teal" style="color: #008B8B; font-weight: bold;">Search Opportunities</h1>
+            <p class="text-muted">Find and explore volunteer opportunities matching your interests</p>
+        </div>
+    </div>
+
+    <!-- Search & Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background-color: #f8fffe;">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('csrrep_search_opportunities') }}" class="row g-3">
+                        <!-- Search Keyword -->
+                        <div class="col-md-4">
+                            <label for="search" class="form-label" style="color: #008B8B; font-weight: 600;">Search Keyword</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   placeholder="Enter keyword..." value="{{ request.args.get('search', '') }}">
+                        </div>
+
+                        <!-- Service Type Filter -->
+                        <div class="col-md-3">
+                            <label for="service_type" class="form-label" style="color: #008B8B; font-weight: 600;">Service Type</label>
+                            <select class="form-select" id="service_type" name="service_type">
+                                <option value="">All Types</option>
+                                <option value="environmental" {% if request.args.get('service_type') == 'environmental' %}selected{% endif %}>Environmental</option>
+                                <option value="education" {% if request.args.get('service_type') == 'education' %}selected{% endif %}>Education</option>
+                                <option value="healthcare" {% if request.args.get('service_type') == 'healthcare' %}selected{% endif %}>Healthcare</option>
+                                <option value="community" {% if request.args.get('service_type') == 'community' %}selected{% endif %}>Community</option>
+                            </select>
+                        </div>
+
+                        <!-- Urgency Filter -->
+                        <div class="col-md-2">
+                            <label for="urgency" class="form-label" style="color: #008B8B; font-weight: 600;">Urgency</label>
+                            <select class="form-select" id="urgency" name="urgency">
+                                <option value="">All</option>
+                                <option value="low" {% if request.args.get('urgency') == 'low' %}selected{% endif %}>Low</option>
+                                <option value="medium" {% if request.args.get('urgency') == 'medium' %}selected{% endif %}>Medium</option>
+                                <option value="high" {% if request.args.get('urgency') == 'high' %}selected{% endif %}>High</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn w-100" style="background-color: #008B8B; color: white; font-weight: 600;">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <p class="text-muted">
+                <span style="color: #008B8B; font-weight: 600;">{{ opportunities.items|length }}</span> opportunities found
+                {% if request.args.get('search') %}
+                    for "<strong>{{ request.args.get('search') }}</strong>"
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Opportunities List -->
+    <div class="row">
+        {% if opportunities.items %}
+            {% for opp in opportunities.items %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm" style="transition: transform 0.3s, box-shadow 0.3s;">
+                    <!-- Card Header with Service Type Badge -->
+                    <div class="card-header border-0" style="background-color: #e0f7f6; padding: 1rem;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge" style="background-color: #008B8B; font-size: 0.75rem;">{{ opp.service_type.upper() }}</span>
+                            <span class="badge {% if opp.urgency == 'high' %}bg-danger{% elif opp.urgency == 'medium' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ opp.urgency.capitalize() }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #008B8B; font-weight: bold;">{{ opp.title }}</h5>
+                        <p class="card-text text-muted">{{ opp.description[:100] }}...</p>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt" style="color: #008B8B;"></i> {{ opp.location }}
+                            </small><br>
+                            <small class="text-muted">
+                                <i class="fas fa-eye" style="color: #008B8B;"></i> {{ opp.view_count }} views
+                            </small>
+                        </div>
+
+                        <!-- Status Badge -->
+                        <div class="mb-3">
+                            {% if opp.status == 'open' %}
+                                <span class="badge bg-success">Open</span>
+                            {% elif opp.status == 'closing_soon' %}
+                                <span class="badge bg-warning">Closing Soon</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Closed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Card Footer with Actions -->
+                    <div class="card-footer bg-white border-top">
+                        <a href="{{ url_for('csrrep_opportunity_detail', request_id=opp.request_id) }}" class="btn w-100" style="background-color: #008B8B; color: white;">
+                            <i class="fas fa-info-circle"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-search fa-2x mb-3" style="color: #008B8B;"></i>
+                    <h5>No opportunities found</h5>
+                    <p class="text-muted">Try adjusting your search filters or keywords</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if opportunities.pages > 1 %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous Page -->
+                    {% if opportunities.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('csrrep_search_opportunities', page=opportunities.prev_num, search=request.args.get('search', ''), service_type=request.args.get('service_type', ''), urgency=request.args.get('urgency', '')) }}">
+                                Previous
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+                    {% for page_num in opportunities.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == opportunities.page %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('csrrep_search_opportunities', page=page_num, search=request.args.get('search', ''), service_type=request.args.get('service_type', ''), urgency=request.args.get('urgency', '')) }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Next Page -->
+                    {% if opportunities.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('csrrep_search_opportunities', page=opportunities.next_num, search=request.args.get('search', ''), service_type=request.args.get('service_type', ''), urgency=request.args.get('urgency', '')) }}">
+                                Next
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .card:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 10px 30px rgba(0, 139, 139, 0.15) !important;
+    }
+</style>
+{% endblock %}
