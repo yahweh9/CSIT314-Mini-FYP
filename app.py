@@ -657,6 +657,63 @@ def admin_suspend_user(user_id):
 
     return redirect(url_for("dashboard_admin"))
 
+# ============================================================================
+# CSR REP FEATURES - SEARCH & SHORTLIST OPPORTUNITIES
+# ============================================================================
+
+@app.route('/csrrep/search_opportunities', methods=['GET'])
+def csrrep_search_opportunities():
+    """Search and browse volunteer opportunities"""
+    return display_search_opportunities()
+
+@app.route('/csrrep/opportunity/<string:request_id>')
+def csrrep_opportunity_detail(request_id):
+    """View detailed information about a specific opportunity"""
+    return display_opportunity_detail(request_id)
+
+@app.route('/csrrep/my_shortlist', methods=['GET'])
+def csrrep_my_shortlist():
+    """View CSR Rep's shortlisted opportunities"""
+    return display_my_shortlist()
+
+@app.route('/csrrep/shortlist/add', methods=['POST'])
+def csrrep_add_to_shortlist():
+    """Add opportunity to shortlist (AJAX)"""
+    return add_to_shortlist()
+
+@app.route('/csrrep/shortlist/remove', methods=['POST'])
+def csrrep_remove_from_shortlist():
+    """Remove opportunity from shortlist (AJAX)"""
+    return remove_from_shortlist()
+
+# ============================================================================
+# CSR REP FEATURES - COMPLETED SERVICES HISTORY & ANALYTICS
+# ============================================================================
+
+@app.route('/csrrep/completed_services', methods=['GET'])
+def csrrep_completed_services():
+    """View completed volunteer services with filters"""
+    return display_completed_services()
+
+@app.route('/csrrep/service/<string:request_id>')
+def csrrep_service_detail(request_id):
+    """View detailed information about a completed service"""
+    return display_service_detail(request_id)
+
+@app.route('/csrrep/history_analytics', methods=['GET'])
+def csrrep_history_analytics():
+    """View analytics dashboard for completed services"""
+    return display_history_analytics()
+
+@app.route('/csrrep/history/export_csv', methods=['GET'])
+def csrrep_export_history():
+    """Export completed services to CSV"""
+    return export_to_csv()
+
+# ============================================================================
+# END OF CSR REP FEATURES
+# ============================================================================
+
 # UTILITY ROUTES
 # -----------------------------
 @app.route("/list_users")
