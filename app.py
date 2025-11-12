@@ -78,7 +78,6 @@ from controllers.PINRequestController import PINRequestController
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
 from entities.FeedbackEntity import FeedbackEntity
-from entities.ShortlistEntity import ShortlistEntity  # NEW
 from entities.InterestEntity import InterestEntity
 from entities.RequestViewEntity import RequestViewEntity
 from entities.ShortlistEntity import ShortlistEntity  # NEW
