@@ -82,7 +82,10 @@ class PINRequestEntity(db.Model):
     
     @classmethod
     def get_unassigned(cls):
-        return cls.query.filter_by(assigned_to_id=None).all()
+        return cls.query.filter_by(
+            assigned_to_id=None,
+            status='pending'
+        ).all()
     
     @classmethod
     def unassign(cls, request_id):

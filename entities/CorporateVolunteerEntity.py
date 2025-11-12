@@ -1,3 +1,4 @@
+# entities/CorporateVolunteerEntity.py
 from .UserEntity import UserEntity
 
 class CorporateVolunteerEntity(UserEntity):

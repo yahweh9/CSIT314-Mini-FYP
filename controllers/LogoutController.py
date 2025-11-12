@@ -1,3 +1,4 @@
+# controllers/LogoutController.py
 from flask import request, session, redirect, url_for, render_template
 from boundaries.web_page import display_login_page
 

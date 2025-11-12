@@ -35,14 +35,50 @@ def display_my_requests():
     
     return render_template('pin_my_requests.html', user=user, requests=active_requests)
 
+#made changes to the content to allow filter mechanism
 def display_request_history():
-    """Display user's request history (including cancelled)"""
+    """Display PIN's completed request history with filters."""
     if 'user_id' not in session or session.get('role') != 'pin':
         return redirect('/')
 
-    user = UserEntity.query.get(session['user_id'])
-    all_requests = PINRequestController.get_completed_requests(session['user_id']) #completed request changed to all_requests
-    return render_template('pin_request_history.html', user=user, requests=all_requests)
+    pin_id = session['user_id']
+    user = UserEntity.query.get(pin_id)
+
+    # Collect filters from query params
+    service_type = request.args.get('service_type', '').strip()
+    status = request.args.get('status', '').strip()
+    date = request.args.get('date', '').strip()
+
+    # Fetch all service types (same as create request form)
+    categories = CategoryController.list_categories()
+    service_types = [c.name for c in categories]
+
+    try:
+        requests = PINRequestController.get_completed_requests_with_filters(
+            pin_id=pin_id,
+            service_type=service_type or None,
+            status=status or None,
+            date=date or None
+        )
+    except Exception:
+        flash("Unable to retrieve request history. Please try again later.", "warning")
+        requests = []
+
+    message = None
+    if not requests:
+        message = "No requests available." if not (service_type or status or date) else "No results match your filters."
+
+    return render_template(
+        'pin_request_history.html',
+        user=user,
+        requests=requests,
+        categories=categories,      # for dropdown
+        service_types=service_types,
+        service_type=service_type,
+        status=status,
+        date=date,
+        message=message
+    )
 
 def display_request_detail(request_id):
     """Display detailed view of a specific request"""

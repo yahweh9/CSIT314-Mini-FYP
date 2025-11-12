@@ -170,27 +170,7 @@
                 <a href="{{ url_for('pin_request_detail', request_id=request.request_id) }}" class="btn btn-primary">
                     View Details
                 </a>
-                
-                {% if request.status == 'pending' %}
-                <form id="activate-form-{{ request.request_id }}" method="POST"
-                    action="{{ url_for('pin_activate_request', request_id=request.request_id) }}" style="display:inline;">
-                </form>
-
-                <a href="#" class="btn btn-success" onclick="document.getElementById('activate-form-{{ request.request_id }}').submit(); return false;">
-                    Activate Request
-                </a> 
-                {% endif %}
-                
-                {% if request.status == 'active' %}
-                <form id="complete-form-{{ request.request_id }}" method="POST"
-                    action="{{ url_for('pin_complete_request', request_id=request.request_id) }}" style="display:inline;">
-                </form>
-
-                <a href="#" class="btn btn-success" onclick="if(confirm('Mark this request as completed?')) { document.getElementById('complete-form-{{ request.request_id }}').submit(); } return false;">
-                    Mark Complete
-                </a>
-                {% endif %}
-                
+                             
                 <a href="{{ url_for('pin_request_history') }}" class="btn btn-secondary">
                     View History
                 </a>

@@ -1,3 +1,4 @@
+# controllers/RegisterController.py
 from flask import render_template, request, session
 from werkzeug.security import generate_password_hash
 

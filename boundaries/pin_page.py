@@ -1,4 +1,4 @@
-# boundary/pin_boundary.py
+# boundary/pin_page.py
 
 from flask import request, session, redirect, url_for, render_template
 from entities.UserEntity import UserEntity

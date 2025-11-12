@@ -335,6 +335,7 @@ def pin_complete_request(request_id):
     if req and req.status == "active":
         req.status = "completed"
         req.updated_at = datetime.utcnow()
+        req.completed_date = datetime.utcnow()
         db.session.commit()
         session["flash_message"] = "Request marked as completed! You can now give feedback."
         session["flash_category"] = "success"

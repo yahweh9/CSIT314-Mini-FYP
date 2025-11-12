@@ -1,4 +1,4 @@
-# boundary/web_boundary.py
+# boundary/web_page.py
 
 from flask import request, session, redirect, url_for, render_template, flash
 from controllers.LoginController import LoginController

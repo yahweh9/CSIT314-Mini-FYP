@@ -1,3 +1,4 @@
+# entities/CSRRepEntity.py
 from .UserEntity import UserEntity
 
 class CSRRepEntity(UserEntity):

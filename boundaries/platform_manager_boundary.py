@@ -1,4 +1,4 @@
-# boundaries/project_manager_boundary.py
+# boundaries/platform_manager_boundary.py
 
 from flask import session, redirect, url_for
 from controllers.PlatformManagerController import PlatformManagerController

@@ -1,8 +1,10 @@
 # controllers/PINRequestController.py
 from flask import request, session, flash
-from datetime import datetime
+from datetime import datetime, timedelta
 from entities.UserEntity import db
 from entities.PINRequestEntity import PINRequestEntity
+from sqlalchemy import func, or_
+
 
 class PINRequestController:
     
@@ -75,11 +77,44 @@ class PINRequestController:
         ).order_by(PINRequestEntity.created_at.desc()).all()
     
     @staticmethod
+    def get_completed_requests_with_filters(pin_id, service_type=None, status=None, date=None):
+        q = PINRequestEntity.query.filter(
+            PINRequestEntity.requested_by_id == pin_id,
+            PINRequestEntity.status.in_(["completed", "late", "cancelled"])
+        )
+
+        if service_type:
+            q = q.filter(PINRequestEntity.service_type == service_type)
+
+        if status:
+            q = q.filter(PINRequestEntity.status == status)
+
+        if date:
+            try:
+                # Parse the date string into a datetime
+                day_start = datetime.strptime(date, "%Y-%m-%d")
+                day_end = day_start + timedelta(days=1)
+
+                # Match completed_date, cancelled_at, or created_at within that day
+                q = q.filter(
+                    or_(
+                        (PINRequestEntity.completed_date >= day_start) & (PINRequestEntity.completed_date < day_end),
+                        (PINRequestEntity.cancelled_at >= day_start) & (PINRequestEntity.cancelled_at < day_end),
+                        (PINRequestEntity.created_at >= day_start) & (PINRequestEntity.created_at < day_end)
+                    )
+                )
+            except ValueError:
+                flash("Invalid date format. Please use YYYY-MM-DD.", "warning")
+                return []
+
+        return q.order_by(PINRequestEntity.created_at.desc()).all()
+    
+    @staticmethod
     def get_completed_requests(pin_id):
         """Get completed requests for history"""
         return PINRequestEntity.query.filter(
             PINRequestEntity.requested_by_id == pin_id,
-            PINRequestEntity.status.in_(['completed', 'expired'])
+            PINRequestEntity.status.in_(['completed', 'late', 'cancelled'])
         ).order_by(PINRequestEntity.created_at.desc()).all()
     
     @staticmethod
@@ -186,6 +221,7 @@ class PINRequestController:
         try:
             request_obj.status = 'cancelled'
             request_obj.cancelled_at = datetime.utcnow()
+            request_obj.updated_at = datetime.utcnow()
             db.session.commit()
             flash("Request cancelled successfully", "success")
             return True

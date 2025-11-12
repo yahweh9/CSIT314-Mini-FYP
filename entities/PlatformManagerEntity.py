@@ -1,3 +1,4 @@
+# entity/PlatformManagerEntity.py
 from .UserEntity import UserEntity
 
 class PlatformManagerEntity(UserEntity):

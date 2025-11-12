@@ -1,3 +1,4 @@
+# entities/RequestViewEntity.py
 from .UserEntity import db
 from datetime import datetime
 
