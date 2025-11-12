@@ -30,7 +30,16 @@ from boundaries.csrrep_page import display_dashboard_csrrep
 from boundaries.cv_page import (
     display_dashboard_cv, display_history_cv, display_report_page, display_account_page
 )
-from boundaries.admin_page import display_dashboard_admin
+
+from boundaries.admin_boundary import (
+    display_dashboard_admin,
+    submit_create_user,
+    submit_update_user,
+    submit_deactivate_user,
+    submit_approve_user,
+    submit_suspend_user,
+    submit_reject_user,   # NEW
+)
 from boundaries.info_boundary import display_homepage, display_csr_mission
 
 # PIN Feature Boundaries
@@ -95,7 +104,7 @@ app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, "test.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
-app.secret_key = "fj39fj_29f9@1nfa91"
+app.secret_key = "fj39fj_29f9@1nfa91"  # ← keep your hardcoded key
 
 db.init_app(app)
 
@@ -603,69 +612,43 @@ def successful_registration():
     return display_successful_registration()
 
 # -----------------------------
-# ADMIN MANAGEMENT
+# ADMIN MANAGEMENT (A03) — via Boundary → Controller
 # -----------------------------
+# If your UI still posts to this CSR-Rep create route, keep it but delegate to the generic create handler.
 @app.route("/admin/create_csr_rep", methods=["GET", "POST"])
 def admin_create_csr_rep():
-    if "username" not in session or session.get("role") != "admin":
-        return redirect("/")
-
     if request.method == "POST":
-        csr_rep = UserEntity(
-            username=request.form["username"],
-            password=generate_password_hash(request.form["password"]),
-            role="csrrep",
-            fullname=request.form["fullname"],
-            email=request.form["email"],
-            company=request.form["company"],
-            status="active",
-        )
-        db.session.add(csr_rep)
-        db.session.commit()
-        return redirect(url_for("dashboard_admin"))
-
+        # Reuse generic create; boundary/controller will set role from form (ensure role='csrrep' in the form).
+        return submit_create_user()
     return redirect(url_for("dashboard_admin"))
 
-@app.route("/admin/approve_user/<int:user_id>")
+@app.get("/admin/approve_user/<int:user_id>")
 def admin_approve_user(user_id):
-    if "username" not in session or session.get("role") != "admin":
-        return redirect("/")
+    return submit_approve_user(user_id)
 
-    user = UserEntity.query.get(user_id)
-    if user and user.status == "pending":
-        user.status = "active"
-        db.session.commit()
-
-    return redirect(url_for("dashboard_admin"))
-
-@app.route("/admin/reject_user/<int:user_id>")
+@app.get("/admin/reject_user/<int:user_id>")
 def admin_reject_user(user_id):
-    if "username" not in session or session.get("role") != "admin":
-        return redirect("/")
+    return submit_reject_user(user_id)
 
-    user = UserEntity.query.get(user_id)
-    if user and user.status == "pending":
-        db.session.delete(user)
-        db.session.commit()
-
-    return redirect(url_for("dashboard_admin"))
-
-@app.route("/admin/suspend_user/<int:user_id>")
+@app.get("/admin/suspend_user/<int:user_id>")
 def admin_suspend_user(user_id):
-    if "username" not in session or session.get("role") != "admin":
-        return redirect("/")
+    return submit_suspend_user(user_id)
 
-    user = UserEntity.query.get(user_id)
-    if user and user.status == "active":
-        user.status = "suspended"
-        db.session.commit()
+@app.post("/admin/users/create")
+def admin_users_create():
+    return submit_create_user()
 
-    return redirect(url_for("dashboard_admin"))
+@app.post("/admin/users/<int:user_id>/update")
+def admin_users_update(user_id):
+    return submit_update_user(user_id)
+
+@app.post("/admin/users/<int:user_id>/deactivate")
+def admin_users_deactivate(user_id):
+    return submit_deactivate_user(user_id)
 
 # ============================================================================
 # CSR REP FEATURES - SEARCH & SHORTLIST OPPORTUNITIES
 # ============================================================================
-
 @app.route('/csrrep/search_opportunities', methods=['GET'])
 def csrrep_search_opportunities():
     """Search and browse volunteer opportunities"""
@@ -694,7 +677,6 @@ def csrrep_remove_from_shortlist():
 # ============================================================================
 # CSR REP FEATURES - COMPLETED SERVICES HISTORY & ANALYTICS
 # ============================================================================
-
 @app.route('/csrrep/completed_services', methods=['GET'])
 def csrrep_completed_services():
     """View completed volunteer services with filters"""

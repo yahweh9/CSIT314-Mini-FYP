@@ -1,4 +1,4 @@
-# entities/AdminEntity.py
+#entities/AdminEntity.py
 from .UserEntity import UserEntity
 
 class AdminEntity(UserEntity):
