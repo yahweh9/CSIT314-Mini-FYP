@@ -96,7 +96,7 @@
         color: #721c24;
         border: 1px solid #f5c6cb;
     }
-    
+
     @media (max-width: 768px) {
         .form-row {
             grid-template-columns: 1fr;
@@ -127,14 +127,10 @@
         <div class="form-group">
             <label for="service_type" class="required">Service Type</label>
             <select id="service_type" name="service_type" required>
-                <option value="">Select a service type</option>
-                <option value="cleanup">Environmental Cleanup</option>
-                <option value="elderly">Elderly Care</option>
-                <option value="education">Education Support</option>
-                <option value="food">Food Distribution</option>
-                <option value="community">Community Event</option>
-                <option value="health">Health Services</option>
-                <option value="other">Other</option>
+                <option class="category-options" value="">Select a category</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.name }}">{{ cat.name }}</option>
+                {% endfor %}
             </select>
         </div>
         

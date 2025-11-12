@@ -477,6 +477,10 @@ def dashboard_platform_manager():
 def dashboard_admin():
     return display_dashboard_admin()
 
+@app.route('/view_history_report')
+def view_history_report():
+    return display_report_page()
+
 # -----------------------------
 # REPORTS UI (no blueprint)
 # -----------------------------

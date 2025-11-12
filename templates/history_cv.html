@@ -17,11 +17,13 @@
         <a class=nav-bar-options href="{{ url_for('logout') }}" class="logout">Logout</a>
     </div>
 </div>
+{% if requests %}
 <div>
-    <button onclick="window.location.href='/view_report'" class="download-btn">
+    <button onclick="window.location.href='/view_history_report'" class="download-btn">
         Download Completed Requests Here
     </button>
 </div>
+{% endif %}
 <div>
     {% if requests %}
     <table class="my-table">

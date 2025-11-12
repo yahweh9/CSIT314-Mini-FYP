@@ -6,6 +6,7 @@ import random
 from entities.UserEntity import db, UserEntity
 from entities.PINRequestEntity import PINRequestEntity
 from entities.VolunteerServiceCategoryEntity import VolunteerServiceCategoryEntity as VCat
+from entities.FeedbackEntity import FeedbackEntity
 
 def _seed_categories_if_empty():
     """Seed dynamic categories derived from realistic activity types."""
@@ -166,6 +167,8 @@ def seed_database():
         categories = VCat.query.order_by(VCat.id.asc()).all()
         category_ids = [c.id for c in categories] if categories else [None]
 
+        # ---- Assigned requests ----
+        print("🟢 Creating assigned requests...")
         for i in range(1, 501):
             csr_rep = random.choice(csr_reps)
             pin = random.choice(pin_users)
@@ -206,7 +209,7 @@ def seed_database():
                 location=pin.address,
                 description=f"Provide assistance to {pin.fullname} at {pin.address}",
                 status=status,
-                service_type=random.choice(["cleanup", "elderly", "education", "food", "community", "environment", "health", "fundraising"]),
+                service_type=random.choice([c.name for c in categories]),
                 urgency=random.choice(["low", "medium", "high"]),
                 skills_required=random.choice([
                     "Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"
@@ -218,6 +221,79 @@ def seed_database():
             )
             pin_requests.append(req)
             db.session.add(req)
+
+        # ---- Add extra unassigned requests ----
+        print("🟡 Creating unassigned requests...")
+        for i in range(1, 11):  # 10 unassigned requests
+            csr_rep = random.choice(csr_reps)
+            pin = random.choice(pin_users)
+
+            start_date = datetime.utcnow() + timedelta(days=random.randint(1, 10))
+            end_date = start_date + timedelta(days=random.randint(1, 5))
+            status = "pending" # unassigned ones shouldn't be completed
+
+            title = f"{random.choice(titles)} #{i}"
+
+            req = PINRequestEntity(
+                requested_by_id=pin.user_id,
+                assigned_to_id=None,          # leave unassigned
+                assigned_by_id=csr_rep.user_id,
+                title=title,
+                start_date=start_date,
+                end_date=end_date,
+                completed_date=None,
+                location=pin.address,
+                description=f"Unassigned request to assist {pin.fullname} at {pin.address}",
+                status=status,
+                service_type=random.choice([c.name for c in categories]),
+                urgency=random.choice(["low", "medium", "high"]),
+                skills_required=random.choice([
+                    "Communication", "Physical labor", "Teaching", "Cooking", "Driving", "First aid"
+                ]),
+                view_count=0,
+                shortlist_count=0,
+                volunteer_service_category_id=random.choice(category_ids)
+            )
+
+            db.session.add(req)
+
+        # ---- Add feedback for some completed requests ----
+        print("⭐ Creating feedback for some completed requests...")
+        completed_requests = [r for r in pin_requests if r.status == "completed"]
+
+        # randomly pick around 30% of completed ones to have feedback
+        sample_feedback_reqs = random.sample(
+            completed_requests, 
+            k=max(1, int(len(completed_requests) * 0.6))
+        ) if completed_requests else []
+
+        for req in sample_feedback_reqs:
+            pin_id = req.requested_by_id
+            rated_user_id = req.assigned_to_id
+            rated_user_role = "cv"  # feedback from PIN about the Corporate Volunteer
+            rating = random.randint(3, 5)
+            comments = random.choice([
+                "Very helpful and friendly.",
+                "Good communication throughout.",
+                "Task completed efficiently.",
+                "Excellent support, would recommend.",
+                "Satisfied with the assistance."
+            ])
+
+            feedback = FeedbackEntity(
+                request_id=req.request_id,
+                pin_id=pin_id,
+                rated_user_id=rated_user_id,
+                rated_user_role=rated_user_role,
+                rating=rating,
+                comments=comments
+            )
+            db.session.add(feedback)
+
+        print(f"✅ Created {len(sample_feedback_reqs)} feedback entries.")
+
+        db.session.commit()
+        print("✅ Added unassigned requests successfully!")
 
         db.session.commit()
 

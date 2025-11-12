@@ -1,6 +1,7 @@
 # boundaries/pin_request_boundary.py
 from flask import request, session, redirect, url_for, render_template, flash
 from controllers.PINRequestController import PINRequestController
+from controllers.CategoryController import CategoryController
 from entities.UserEntity import UserEntity
 
 def display_create_request_form():
@@ -9,7 +10,10 @@ def display_create_request_form():
         return redirect('/')
     
     user = UserEntity.query.get(session['user_id'])
-    return render_template('pin_create_request.html', user=user)
+    categories = CategoryController.list_categories()
+    
+    print("📂 Categories fetched:", categories) #DELETE
+    return render_template('pin_create_request.html', user=user, categories=categories)
 
 def handle_create_request():
     """Handle request creation form submission"""

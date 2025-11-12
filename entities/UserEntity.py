@@ -42,6 +42,6 @@ class UserEntity(db.Model):
         return self.role == 'cv'
     
     def requires_approval(self):
-        """PIN and CV accounts require admin approval"""
+        # PIN and CV accounts require admin approval
         return self.role in ['pin', 'cv'] and self.status == 'pending'
 
