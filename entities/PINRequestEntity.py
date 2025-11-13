@@ -1,6 +1,8 @@
 # entities/PINRequestEntity.py
 from .UserEntity import db
 from datetime import datetime
+from sqlalchemy import func
+
 
 
 class PINRequestEntity(db.Model):
@@ -96,3 +98,38 @@ class PINRequestEntity(db.Model):
         req.assigned_to_id = None
         return req
 
+    @classmethod
+    def get_completed(cls, cv):
+        """Return all completed requests for a given CV."""
+        return (
+            cls.query.filter(
+                cls.assigned_to_id == cv.user_id,
+                cls.status == 'completed'
+            ).all()
+        )
+
+    @classmethod
+    def get_incomplete_pin_requests(cls, cv, status=None, urgency=None, sort=None):
+        """Return all incomplete (pending, active, late) requests for the given CV."""
+
+        # Base query: only incomplete ones
+        query = cls.query.filter(
+            cls.assigned_to_id == cv.user_id,
+            cls.status.in_(["pending", "active", "late"])
+        )
+
+        # Filter by status
+        if status:
+            query = query.filter(cls.status == status)
+
+        # Filter by urgency
+        if urgency:
+            query = query.filter(func.lower(cls.urgency) == urgency.lower())
+
+        # Apply sorting if provided
+        if sort == "end_date_asc":
+            query = cls.sort_by_end_date(query, "asc")
+        elif sort == "end_date_desc":
+            query = cls.sort_by_end_date(query, "desc")
+
+        return query.all()

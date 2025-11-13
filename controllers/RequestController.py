@@ -18,7 +18,7 @@ class RequestController:
     def get_incomplete_requests(cv, status=None, urgency=None, sort=None):
         now = datetime.utcnow()
 
-        # Auto-update late requests using entity method
+        # Update late requests before fetching
         active_reqs = PINRequestEntity.query.filter_by(
             assigned_to_id=cv.user_id, status="active"
         ).all()
@@ -26,61 +26,34 @@ class RequestController:
         for req in active_reqs:
             if req.is_late():
                 req.mark_as_late()
-
         db.session.commit()
 
-        # Base query (pending, active, late)
-        query = PINRequestEntity.query.filter(
-            PINRequestEntity.assigned_to_id == cv.user_id,
-            PINRequestEntity.status.in_(["pending", "active", "late"])
+        # Fetch incomplete ones using entity method
+        assigned_requests = PINRequestEntity.get_incomplete_pin_requests(
+            cv, status=status, urgency=urgency, sort=sort
         )
 
-        # Filter by status using entity match method
-        if status:
-            query = query.filter(PINRequestEntity.status == status)
-
-        # Filter by urgency using entity method
-        if urgency:
-            query = query.filter(
-                func.lower(PINRequestEntity.urgency) == urgency.lower()
-            )
-
-        # Apply sorting using the entity helper
-        if sort == "end_date_asc":
-            query = PINRequestEntity.sort_by_end_date(query, "asc")
-        elif sort == "end_date_desc":
-            query = PINRequestEntity.sort_by_end_date(query, "desc")
-
-        # Get final list
-        assigned_requests = query.all()
-
-        # Attach PIN name (boundary convenience data)
+        # Attach PIN names for UI display
         for req in assigned_requests:
             pin_user = UserEntity.query.get(req.requested_by_id)
             req.pin_name = pin_user.fullname if pin_user else "Unknown"
 
         return assigned_requests
 
-    # Get all completed requests of a CV (status is 'completed')
+
     @staticmethod
     def get_request_history(cv):
-        # get PIN requests completed by this CV - status == "completed"
-        completed_requests = (
-            PINRequestEntity.query
-            .filter(
-                PINRequestEntity.assigned_to_id == cv.user_id,
-                PINRequestEntity.status.in_(["completed"])
-            )
-            .all()
-        )
+        # get completed requests using entity method
+        completed_requests = PINRequestEntity.get_completed(cv)
 
-        # attach the PIN's name to each request
+        # attach the PIN's name and feedback rating to each request
         for req in completed_requests:
             pin_user = UserEntity.query.get(req.requested_by_id)
             req.pin_name = pin_user.fullname if pin_user else "Unknown"
             req.feedback_rating = FeedbackEntity.get_feedback_rating(req.request_id)
-            
+
         return completed_requests
+
     
     @staticmethod
     def accept_request(request_id):
