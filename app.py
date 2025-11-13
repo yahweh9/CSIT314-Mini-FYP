@@ -40,7 +40,7 @@ from boundaries.admin_boundary import (
     submit_suspend_user,
     submit_reject_user,   # NEW
 )
-from boundaries.info_boundary import display_homepage, display_csr_mission
+
 
 # PIN Feature Boundaries
 from boundaries.pin_feedback_boundary import (
@@ -165,17 +165,10 @@ def _build_report_payload(period_start: datetime, period_end: datetime, granular
     }
 
 # -----------------------------
-# GUEST HOMEPAGE
+# GUEST HOMEPAGE-LOGIN
 # -----------------------------
+
 @app.route("/", methods=["POST", "GET"])
-def homepage():
-    return display_homepage()
-
-@app.route("/csr_mission")
-def csr_mission():
-    return display_csr_mission()
-
-@app.route("/login_page", methods=["POST", "GET"])
 def login_page():
     return display_login_page()
 

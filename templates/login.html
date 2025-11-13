@@ -5,33 +5,47 @@
 {% endblock %}
 
 {% block body %}
-<div class="main-header">
-    <h1>SDM CV Connect</h1>
-</div>
-<div class="login-box">
-    <h2 class="login-text">Login</h2>
-    <form action="{{ url_for('login_page') }}" method="POST">
-        <div>
-            <label for="uname"><b>Username:</b></label>  
-            <input type="text" name="username" id="username">   
-        </div>
-        <div>
-            <label for="pw"><b>Password:</b></label>
-            <input type="password" name="password" id="password">
-        </div>
-            <a href="{{ url_for('register_pin') }}">Register as a Person-In-Need(PIN)</a>
-        <div>
+<div class="homepage-wrapper">
+    <!-- Left side: branding / mission -->
+    <div class="homepage-left">
+        <h1>SDM CV Connect</h1>
+        <img src="{{ url_for('static', filename='images/login-page-illustration.jpg') }}" 
+             alt="CSR Illustration" class="homepage-image">
+             
+        <p class="tagline">Volunteering with Heart, Impacting Lives with Purpose</p>
 
-        </div>
-        <button type="submit">Login</button> 
-    </form>
+        <p class="features">Volunteer matching • Request management • Impact tracking</p>
+        
+    </div>
+    
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endwith %}
+    <!-- Right side: welcome + login form -->
+    <div class="homepage-right">
+        <h1>Welcome to SDM CV Connect</h1>
+        <p>We connect Corporate Volunteers with Persons-In-Need to create kindness, dignity, and lasting impact</p>
+
+        <!-- Your original login box -->
+        <div class="login-box">
+            <h2 class="login-text">Login</h2>
+            <form action="{{ url_for('login_page') }}" method="POST">
+                <div>
+                    <label for="username"><b>Username:</b></label>
+                    <input type="text" name="username" id="username" required>
+                </div>
+                <div>
+                    <label for="password"><b>Password:</b></label>
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <a href="{{ url_for('register_pin') }}">Register as a Person-In-Need (PIN)</a>
+                <button type="submit" class="main-btn">Login</button>
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+    </div>
 </div>
 {% endblock %}
-
-

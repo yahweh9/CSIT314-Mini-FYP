@@ -510,3 +510,255 @@ body {
 .text-muted {
     color: #666666 !important;
 }
+
+
+/* Secondary link under the button */
+.guest-link {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #ffd166;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.guest-link:hover {
+    color: #ffe599;
+}
+
+/* Split-screen homepage */
+.homepage-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Left side */
+.homepage-left {
+    flex: 1;
+    background: rgb(0, 120, 124);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.homepage-left .illustration img {
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.homepage-left .tagline {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 20px 0 10px;
+}
+
+.homepage-left .features {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Right side */
+.homepage-right {
+    flex: 1;
+    background: #f9f9f9;
+    color: #00353b;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    text-align: center;
+}
+
+.homepage-right h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.homepage-right p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* CTA button */
+.cta-button {
+    display: inline-block;
+    padding: 15px 40px;
+    background-color: #007bff;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-bottom: 15px;
+}
+
+.cta-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Secondary link */
+.guest-link {
+    color: #007bff;
+    text-decoration: underline;
+    font-size: 1rem;
+}
+
+.guest-link:hover {
+    color: #0056b3;
+}
+
+/* Responsive tweak */
+@media (max-width: 768px) {
+    .homepage-wrapper {
+        flex-direction: column;
+    }
+    .homepage-left, .homepage-right {
+        flex: none;
+        width: 100%;
+    }
+}
+
+.homepage-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Left side */
+.homepage-left {
+    flex: 1;
+    background: rgb(0, 120, 124); /* same teal tone */
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.homepage-left h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.homepage-left .tagline {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 20px 0 10px;
+}
+
+.homepage-left .features {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Right side */
+.homepage-right {
+    flex: 1;
+    background: #f9f9f9;
+    color: #00353b;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    text-align: center;
+}
+
+.homepage-right h1 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.homepage-right p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Responsive tweak */
+@media (max-width: 768px) {
+    .homepage-wrapper {
+        flex-direction: column;
+    }
+    .homepage-left, .homepage-right {
+        flex: none;
+        width: 100%;
+    }
+}
+
+.homepage-image {
+    max-width: 400px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 12px; /* optional rounded corners */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* subtle shadow */
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Reuse main-btn styling for both buttons */
+.cancel-btn {
+    text-align: center;
+}
+
+.cancel-btn {
+    display: inline-block;
+    margin-left: 20px;
+    padding: 12px 30px;
+    background-color: #cccccc;
+    color: #333333;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background-color: #999999;
+    transform: scale(1.05);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Reuse main-btn styling for both buttons */
+.main-btn {
+    padding: 12px 30px;
+    background-color: #007bff;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.main-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Cancel button inherits main-btn styling */
+.cancel-btn {
+    text-align: center;
+}

@@ -30,7 +30,10 @@
         <div>
             <input type="password" name="confirm_password" id="confirm_password">
         </div>
-        <button type="submit">Next</button> 
+        <div class="form-actions">
+            <button type="submit" class="main-btn">Next</button>
+            <a href="{{ url_for('login_page') }}" class="main-btn cancel-btn">Cancel</a>
+        </div>
     </form>
 </div>
 {% endblock %}
