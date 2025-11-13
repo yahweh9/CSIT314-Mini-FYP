@@ -49,9 +49,11 @@
         <div class="form-group">
             <label for="service_type" class="required">Service Type</label>
             <select id="service_type" name="service_type" required>
-                <option value="">All</option>
+                <option value="{{ request.service_type }}" selected>{{ request.service_type }}</option>
                 {% for cat in categories %}
-                    <option value="{{ cat.name }}" {% if service_type == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                    {% if cat.name != request.service_type %}
+                        <option value="{{ cat.name }}">{{ cat.name }}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
         </div>
