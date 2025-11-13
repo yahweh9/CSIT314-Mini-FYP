@@ -111,8 +111,15 @@ def handle_edit_request(request_id):
         else:
             return redirect(url_for('pin_edit_request', request_id=request_id))
 
+    categories = CategoryController.list_categories()
+    service_type = [c.name for c in categories]
+
     # GET → show edit form
-    return render_template('pin_edit_request.html', request=request_obj)
+    return render_template('pin_edit_request.html',
+                           request=request_obj,
+                           categories=categories,
+                           service_type=service_type)
+
 
 def handle_cancel_request(request_id):
     """Handle cancelling a request (soft delete)"""

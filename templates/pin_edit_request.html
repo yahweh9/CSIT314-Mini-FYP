@@ -49,14 +49,10 @@
         <div class="form-group">
             <label for="service_type" class="required">Service Type</label>
             <select id="service_type" name="service_type" required>
-                <option value="">Select a service type</option>
-                <option value="cleanup" {% if request.service_type == 'cleanup' %}selected{% endif %}>Environmental Cleanup</option>
-                <option value="elderly" {% if request.service_type == 'elderly' %}selected{% endif %}>Elderly Care</option>
-                <option value="education" {% if request.service_type == 'education' %}selected{% endif %}>Education Support</option>
-                <option value="food" {% if request.service_type == 'food' %}selected{% endif %}>Food Distribution</option>
-                <option value="community" {% if request.service_type == 'community' %}selected{% endif %}>Community Event</option>
-                <option value="health" {% if request.service_type == 'health' %}selected{% endif %}>Health Services</option>
-                <option value="other" {% if request.service_type == 'other' %}selected{% endif %}>Other</option>
+                <option value="">All</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.name }}" {% if service_type == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
             </select>
         </div>
 
