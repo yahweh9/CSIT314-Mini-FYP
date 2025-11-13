@@ -30,15 +30,6 @@
 {% block body %}
 <div class="form-container">
     <h1>Edit Assistance Request</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     <form method="POST" action="{{ url_for('pin_edit_request', request_id=request.request_id) }}">
         <div class="form-group">
             <label for="title" class="required">Request Title</label>
