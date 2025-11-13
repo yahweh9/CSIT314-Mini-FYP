@@ -31,8 +31,15 @@
             <input type="password" name="confirm_password" id="confirm_password">
         </div>
         <div class="form-actions">
-            <button type="submit" class="main-btn">Next</button>
-            <a href="{{ url_for('login_page') }}" class="main-btn cancel-btn">Cancel</a>
+            <button type="submit" class="main-btn">
+                Next
+            </button>
+            <button type="button" class="main-btn"
+                    onclick="window.location='{{ url_for('login_page') }}'">
+                Cancel
+            </button>
+
+
         </div>
     </form>
 </div>
